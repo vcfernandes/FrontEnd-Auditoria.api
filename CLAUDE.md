@@ -1,0 +1,103 @@
+# CLAUDE.md — auditoria-web
+
+## Sobre o projeto
+
+Front-end (PWA) de um app de **auditorias e inspeções sanitárias** para consultores e responsáveis técnicos em segurança alimentar (ex.: um médico veterinário que audita padarias, açougues, restaurantes).
+
+O consultor usa principalmente **no celular**, dentro do estabelecimento, respondendo o checklist em pé e às vezes com internet ruim. No **computador** ele consulta o histórico e baixa relatórios.
+
+**Objetivo atual: protótipo.** Entregar o caminho mínimo para o consultor usar no dia a dia e dar feedback. Nada de recursos além da lista "Telas da primeira versão" sem eu pedir.
+
+O backend é outro repositório (`auditoria-api`, Java 21 + Spring Boot 4) e já está pronto para o protótipo.
+
+## Como trabalhar comigo
+
+- Responda em **português**. Textos da interface também em português (pt-BR).
+- Trabalhe **uma etapa por vez** (uma tela ou uma peça de infraestrutura). Ao terminar, rode `npm run build` e `npm run lint`, explique brevemente as decisões principais e me diga como testar no navegador.
+- Antes de criar ou alterar arquivos, diga quais serão.
+- Não implemente itens do backlog sem eu pedir.
+- Ao concluir uma etapa, atualize a seção **Status** deste arquivo.
+- Se subir o servidor de desenvolvimento para testar, encerre ao terminar.
+
+## Stack
+
+- **React + TypeScript + Vite**
+- **PWA** com `vite-plugin-pwa` (manifesto + service worker; instalar na tela inicial)
+- **React Router**: navegação
+- **TanStack Query**: chamadas à API (cache, loading, erro, invalidação)
+- **React Hook Form + Zod**: formulários e validação
+- **Tailwind CSS + shadcn/ui**: interface, **mobile-first**
+- **openapi-typescript**: tipos gerados a partir do Swagger do backend
+- Gerenciador de pacotes: **npm**
+
+## Backend (API)
+
+- Base em desenvolvimento: `http://localhost:8080` (configurar em `VITE_API_URL`, arquivo `.env`)
+- Swagger: `http://localhost:8080/swagger-ui.html` · OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+- Gere os tipos com o backend rodando: `npx openapi-typescript http://localhost:8080/v3/api-docs -o src/api/schema.d.ts` (deixar como script `npm run gen:api`)
+- CORS do backend já libera `http://localhost:5173`.
+
+### Autenticação
+- `POST /auth/registrar` (nomeOrganizacao, nome, email, senha) e `POST /auth/login` (email, senha) devolvem `{ token, expiraEmSegundos, usuarioId, nome, email, papel }`.
+- Demais rotas: header `Authorization: Bearer <token>`.
+- `GET /auth/me` devolve o usuário logado.
+- Token expira em 8 h. Ao receber **401**, limpar a sessão e voltar ao login.
+
+### Formato de erro (todas as rotas)
+`{ status, mensagem, campos?, timestamp }`. Em validação (400), `campos` é um mapa `campo → mensagem`: mostrar cada mensagem no campo correspondente do formulário. Nos demais erros, mostrar `mensagem`.
+
+### Rotas usadas no protótipo
+- **Clientes**: `GET /clientes?nome=&page=&size=` (paginado: `content` + `page`), `POST /clientes`, `GET/PUT/DELETE /clientes/{id}`. Campos: nome, cnpj (opcional, com ou sem máscara), categoria (texto livre), tipo (usar `SIMPLES` no protótipo).
+- **Modelos de checklist**: `GET /checklists` (lista da organização + biblioteca, campo `biblioteca`), `GET /checklists/{id}`, `POST /checklists/{id}/duplicar`. O modelo padrão da biblioteca é a RDC 216/2004 (Anvisa).
+- **Auditorias**:
+  - `POST /auditorias` (clienteId, modeloId, data opcional, observacoes opcional) → auditoria com `secoes[].itens[]` e `resumo`.
+  - `GET /auditorias?clienteId=&status=&page=&size=` (paginado).
+  - `GET /auditorias/{id}`.
+  - `PUT /auditorias/{id}/respostas` com `{ "respostas": [{ itemId, resposta, observacao }] }`. `resposta`: `CONFORME`, `NAO_CONFORME`, `NAO_SE_APLICA` ou `null` (limpa). Só com status `EM_ANDAMENTO`.
+  - `POST /auditorias/{id}/finalizar` (422 se faltar obrigatória), `POST /auditorias/{id}/reabrir`, `DELETE /auditorias/{id}` (só em andamento).
+  - `GET /auditorias/{id}/relatorio.pdf`: só finalizada. Baixar com o token no header (fetch → blob), não por link direto.
+- `resumo`: total, respondidas, conformes, naoConformes, naoSeAplica, obrigatoriasPendentes.
+- Classificação: `EXCELENTE` (verde), `BOM` (azul), `REGULAR` (amarelo), `INADEQUADO` (vermelho).
+
+## Telas da primeira versão
+
+1. **Entrar / Criar conta**
+2. **Clientes**: lista com busca + cadastro/edição
+3. **Nova auditoria**: escolher cliente e modelo
+4. **Responder auditoria**: perguntas agrupadas por seção, botões grandes Conforme / Não conforme / Não se aplica, observação por pergunta, **salvamento automático**, indicador de progresso (obrigatórias pendentes) e botão Finalizar
+5. **Resultado**: nota, classificação com a cor da faixa, resumo, botão Baixar PDF, botão Reabrir
+6. **Histórico**: lista de auditorias com filtro por status e cliente
+
+Navegação no celular: barra inferior (Auditorias, Clientes, Conta). No computador: menu lateral.
+
+## Convenções
+
+- Pastas: `src/api` (cliente HTTP, tipos gerados, hooks do TanStack Query por recurso), `src/pages` (uma pasta por tela), `src/components` (compartilhados; `src/components/ui` = shadcn), `src/lib` (utilitários), `src/auth` (sessão/token).
+- Um único cliente HTTP que injeta o token e trata 401 e o formato de erro.
+- Sessão (token + usuário) em `localStorage`.
+- Datas exibidas em `dd/mm/aaaa`; notas com vírgula (`69,23`).
+- Componentes pequenos; sem lógica de API dentro de componentes de UI (usar os hooks de `src/api`).
+- Botões e áreas de toque grandes (uso com uma mão, em pé).
+
+## Status
+
+### Feito
+- [x] Projeto criado com Vite (React + TypeScript)
+
+### Protótipo (fazer agora, nesta ordem)
+- [ ] Base: Tailwind + shadcn/ui, React Router, TanStack Query, cliente HTTP, tipos do OpenAPI, `.env`
+- [ ] Autenticação: telas Entrar / Criar conta, sessão, rotas protegidas, logout
+- [ ] Layout: navegação inferior (celular) e lateral (computador)
+- [ ] Clientes: lista + cadastro/edição
+- [ ] Nova auditoria
+- [ ] Responder auditoria
+- [ ] Resultado + PDF
+- [ ] Histórico
+- [ ] PWA: manifesto, ícones, instalação
+
+### Depois do protótipo (backlog)
+- Editor de modelos de checklist
+- Modo offline (respostas guardadas no aparelho e sincronizadas depois)
+- Fotos nas não conformidades
+- Unidades e setores de clientes
+- Empacotar como app de loja (Capacitor), se necessário
