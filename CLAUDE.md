@@ -83,9 +83,11 @@ Navegação no celular: barra inferior (Auditorias, Clientes, Conta). No computa
 
 ### Feito
 - [x] Projeto criado com Vite (React + TypeScript)
+- [x] Base: Tailwind v4 + shadcn/ui (preset Nova), React Router, TanStack Query, cliente HTTP (`src/api/client.ts`), tipos do OpenAPI (`npm run gen:api`), `.env` (modelo em `.env.example`). Página inicial provisória em `src/pages/inicio`.
+  - `gen:api` roda o `openapi-typescript` via `npx` com TypeScript 5 isolado, porque ele não aceita o TypeScript 7 do projeto.
+  - Componentes shadcn importam `cn` do pacote `cn` (oficial do shadcn), não de clsx/tailwind-merge.
 
 ### Protótipo (fazer agora, nesta ordem)
-- [ ] Base: Tailwind + shadcn/ui, React Router, TanStack Query, cliente HTTP, tipos do OpenAPI, `.env`
 - [ ] Autenticação: telas Entrar / Criar conta, sessão, rotas protegidas, logout
 - [ ] Layout: navegação inferior (celular) e lateral (computador)
 - [ ] Clientes: lista + cadastro/edição
