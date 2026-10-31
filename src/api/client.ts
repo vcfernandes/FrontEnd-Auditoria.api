@@ -36,7 +36,8 @@ interface Opcoes {
 }
 
 function montarUrl(caminho: string, params?: Params) {
-  const url = new URL(caminho, API_URL)
+  // API_URL pode ser relativa (/api, via proxy do Vite) ou absoluta.
+  const url = new URL(API_URL.replace(/\/$/, '') + caminho, window.location.origin)
   for (const [chave, valor] of Object.entries(params ?? {})) {
     if (valor !== undefined && valor !== null && valor !== '') {
       url.searchParams.set(chave, String(valor))

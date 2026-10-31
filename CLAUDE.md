@@ -32,10 +32,20 @@ O backend é outro repositório (`auditoria-api`, Java 21 + Spring Boot 4) e já
 
 ## Backend (API)
 
-- Base em desenvolvimento: `http://localhost:8080` (configurar em `VITE_API_URL`, arquivo `.env`)
+- Base da API: `http://localhost:8080`. Em desenvolvimento o front **não** chama essa URL direto: `VITE_API_URL=/api` (arquivo `.env`, modelo em `.env.example`) e o proxy do Vite (`vite.config.ts`) encaminha `/api/*` para `http://localhost:8080/*`, removendo o `/api`. Assim o app funciona também no celular, onde `localhost` seria o próprio aparelho. Em produção, definir `VITE_API_URL` com a URL real da API.
+- O proxy remove o header `Origin` das chamadas (o CORS do backend só libera `localhost:5173`, e pelo celular o Origin seria o IP da rede).
+- O servidor de desenvolvimento usa `host: true` (aceita acesso pela rede local).
 - Swagger: `http://localhost:8080/swagger-ui.html` · OpenAPI JSON: `http://localhost:8080/v3/api-docs`
 - Gere os tipos com o backend rodando: `npx openapi-typescript http://localhost:8080/v3/api-docs -o src/api/schema.d.ts` (deixar como script `npm run gen:api`)
 - CORS do backend já libera `http://localhost:5173`.
+
+### Testar no celular (Wi-Fi)
+1. Backend rodando em `localhost:8080` e `npm run dev` no computador.
+2. Celular no **mesmo Wi-Fi** do computador.
+3. Descubra o IP do computador (`ipconfig`, adaptador de Wi-Fi/Ethernet, "Endereço IPv4"; hoje é `192.168.1.103`, pode mudar) ou use o endereço "Network" que o Vite mostra ao subir.
+4. No navegador do celular: `http://<IP>:5173`.
+5. Se não abrir: liberar a porta 5173 no Firewall do Windows (rede privada) e conferir que o IP não é o de VPN (Radmin) ou de WSL/Hyper-V.
+6. Instalar como PWA no celular exige HTTPS (exceto `localhost`); por IP em http o app abre normalmente, mas sem o "instalar".
 
 ### Autenticação
 - `POST /auth/registrar` (nomeOrganizacao, nome, email, senha) e `POST /auth/login` (email, senha) devolvem `{ token, expiraEmSegundos, usuarioId, nome, email, papel }`.
@@ -83,12 +93,13 @@ Navegação no celular: barra inferior (Auditorias, Clientes, Conta). No computa
 
 ### Feito
 - [x] Projeto criado com Vite (React + TypeScript)
+- [x] Dev na rede local: proxy `/api` no Vite, `VITE_API_URL=/api`, `host: true` (ver "Testar no celular"). `montarUrl` em `src/api/client.ts` aceita base relativa ou absoluta.
 - [x] Base: Tailwind v4 + shadcn/ui (preset Nova), React Router, TanStack Query, cliente HTTP (`src/api/client.ts`), tipos do OpenAPI (`npm run gen:api`), `.env` (modelo em `.env.example`). Página inicial provisória em `src/pages/inicio`.
   - `gen:api` roda o `openapi-typescript` via `npx` com TypeScript 5 isolado, porque ele não aceita o TypeScript 7 do projeto.
   - Componentes shadcn importam `cn` do pacote `cn` (oficial do shadcn), não de clsx/tailwind-merge.
+- [x] Autenticação: telas Entrar / Criar conta (`src/pages/entrar`, `src/pages/criar-conta`), sessão em `src/auth` (`AuthProvider` + `useAuth`), `RotaProtegida` / `RotaPublica`, logout. Erros 400 vão para o campo (`src/lib/erros.ts`), os demais viram mensagem geral. 401 com token limpa a sessão no cliente HTTP e a rota protegida redireciona para `/entrar`.
 
 ### Protótipo (fazer agora, nesta ordem)
-- [ ] Autenticação: telas Entrar / Criar conta, sessão, rotas protegidas, logout
 - [ ] Layout: navegação inferior (celular) e lateral (computador)
 - [ ] Clientes: lista + cadastro/edição
 - [ ] Nova auditoria
