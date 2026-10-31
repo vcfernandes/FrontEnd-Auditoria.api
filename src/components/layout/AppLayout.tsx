@@ -1,17 +1,20 @@
-import { ClipboardCheck } from 'lucide-react'
-import { NavLink, Outlet, useMatches } from 'react-router'
+import { ArrowLeft, ClipboardCheck } from 'lucide-react'
+import { Link, NavLink, Outlet, useMatches } from 'react-router'
 import { cn } from '@/lib/utils'
 import { itensNavegacao } from './itensNavegacao'
 
 /** Cada rota pode declarar `handle: { titulo }` para aparecer no cabeçalho do celular. */
 export interface RotaHandle {
   titulo?: string
+  /** Telas internas: mostra a seta de voltar no cabeçalho do celular. */
+  voltar?: string
 }
 
 export function AppLayout() {
-  const titulo = useMatches()
-    .map((m) => (m.handle as RotaHandle | undefined)?.titulo)
-    .findLast(Boolean)
+  const handle = useMatches()
+    .map((m) => m.handle as RotaHandle | undefined)
+    .findLast((h) => h?.titulo)
+  const titulo = handle?.titulo
 
   return (
     <div className="min-h-dvh md:pl-60">
@@ -44,7 +47,18 @@ export function AppLayout() {
 
       {/* Cabeçalho (celular) */}
       <header className="sticky top-0 z-10 border-b bg-background pt-[env(safe-area-inset-top)] md:hidden">
-        <p className="flex h-14 items-center px-4 text-lg font-semibold">{titulo}</p>
+        <div className="flex h-14 items-center gap-1 px-2">
+          {handle?.voltar && (
+            <Link
+              to={handle.voltar}
+              aria-label="Voltar"
+              className="flex size-11 items-center justify-center rounded-lg active:bg-muted"
+            >
+              <ArrowLeft className="size-6" aria-hidden />
+            </Link>
+          )}
+          <p className={cn('text-lg font-semibold', !handle?.voltar && 'px-2')}>{titulo}</p>
+        </div>
       </header>
 
       {/* Espaço extra embaixo no celular para a barra fixa e a área segura do iPhone */}

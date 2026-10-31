@@ -100,9 +100,10 @@ Navegação no celular: barra inferior (Auditorias, Clientes, Conta). No computa
 - [x] Autenticação: telas Entrar / Criar conta (`src/pages/entrar`, `src/pages/criar-conta`), sessão em `src/auth` (`AuthProvider` + `useAuth`), `RotaProtegida` / `RotaPublica`, logout. Erros 400 vão para o campo (`src/lib/erros.ts`), os demais viram mensagem geral. 401 com token limpa a sessão no cliente HTTP e a rota protegida redireciona para `/entrar`.
 - [x] Layout: `src/components/layout/AppLayout.tsx` (barra inferior + cabeçalho no celular, menu lateral a partir de `md`/768 px; itens em `itensNavegacao.ts`). Título do cabeçalho vem de `handle: { titulo }` na rota. Área segura do iPhone via `viewport-fit=cover` + `env(safe-area-inset-*)`. Páginas Auditorias e Clientes vazias ("em construção"); Conta mostra nome, e-mail e perfil + Sair; `/` redireciona para `/auditorias`.
   - Pendência do backend: a API não devolve o nome da organização em `/auth/me` nem no login, então a Conta não mostra a organização.
+- [x] Clientes: lista com busca (debounce de 400 ms) e "Carregar mais" (`useInfiniteQuery`), cartão com nome/categoria/CNPJ formatado, estados vazio e de carregamento; formulário único para criar/editar em `/clientes/novo` e `/clientes/:id` (CNPJ com máscara, categoria com sugestões em botões + texto livre, `tipo` sempre `SIMPLES`); 409 vai para o campo CNPJ; Inativar com confirmação e volta para a lista. Hooks em `src/api/clientes.ts` (mutações invalidam `['clientes']`). O cabeçalho do celular mostra seta de voltar quando a rota tem `handle.voltar`.
+  - Não verificado contra a API: se limpar o CNPJ/categoria na edição (campo omitido no PUT) realmente apaga o valor no backend.
 
 ### Protótipo (fazer agora, nesta ordem)
-- [ ] Clientes: lista + cadastro/edição
 - [ ] Nova auditoria
 - [ ] Responder auditoria
 - [ ] Resultado + PDF

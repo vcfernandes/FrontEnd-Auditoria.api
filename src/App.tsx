@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router'
 import { RotaProtegida, RotaPublica } from '@/auth/RotaProtegida'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { AuditoriasPage } from '@/pages/auditorias/AuditoriasPage'
+import { ClienteFormPage } from '@/pages/clientes/ClienteFormPage'
 import { ClientesPage } from '@/pages/clientes/ClientesPage'
 import { ContaPage } from '@/pages/conta/ContaPage'
 import { CriarContaPage } from '@/pages/criar-conta/CriarContaPage'
@@ -25,6 +26,16 @@ const router = createBrowserRouter([
         children: [
           { path: '/auditorias', element: <AuditoriasPage />, handle: { titulo: 'Auditorias' } },
           { path: '/clientes', element: <ClientesPage />, handle: { titulo: 'Clientes' } },
+          {
+            path: '/clientes/novo',
+            element: <ClienteFormPage />,
+            handle: { titulo: 'Novo cliente', voltar: '/clientes' },
+          },
+          {
+            path: '/clientes/:id',
+            element: <ClienteFormPage />,
+            handle: { titulo: 'Editar cliente', voltar: '/clientes' },
+          },
           { path: '/conta', element: <ContaPage />, handle: { titulo: 'Conta' } },
         ],
       },
