@@ -98,9 +98,10 @@ Navegação no celular: barra inferior (Auditorias, Clientes, Conta). No computa
   - `gen:api` roda o `openapi-typescript` via `npx` com TypeScript 5 isolado, porque ele não aceita o TypeScript 7 do projeto.
   - Componentes shadcn importam `cn` do pacote `cn` (oficial do shadcn), não de clsx/tailwind-merge.
 - [x] Autenticação: telas Entrar / Criar conta (`src/pages/entrar`, `src/pages/criar-conta`), sessão em `src/auth` (`AuthProvider` + `useAuth`), `RotaProtegida` / `RotaPublica`, logout. Erros 400 vão para o campo (`src/lib/erros.ts`), os demais viram mensagem geral. 401 com token limpa a sessão no cliente HTTP e a rota protegida redireciona para `/entrar`.
+- [x] Layout: `src/components/layout/AppLayout.tsx` (barra inferior + cabeçalho no celular, menu lateral a partir de `md`/768 px; itens em `itensNavegacao.ts`). Título do cabeçalho vem de `handle: { titulo }` na rota. Área segura do iPhone via `viewport-fit=cover` + `env(safe-area-inset-*)`. Páginas Auditorias e Clientes vazias ("em construção"); Conta mostra nome, e-mail e perfil + Sair; `/` redireciona para `/auditorias`.
+  - Pendência do backend: a API não devolve o nome da organização em `/auth/me` nem no login, então a Conta não mostra a organização.
 
 ### Protótipo (fazer agora, nesta ordem)
-- [ ] Layout: navegação inferior (celular) e lateral (computador)
 - [ ] Clientes: lista + cadastro/edição
 - [ ] Nova auditoria
 - [ ] Responder auditoria
