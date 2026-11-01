@@ -1,6 +1,7 @@
 import { ArrowLeft, ClipboardCheck } from 'lucide-react'
 import { Link, NavLink, Outlet, useMatches } from 'react-router'
 import { cn } from '@/lib/utils'
+import { AvisoOffline } from '@/pwa/AvisoOffline'
 import { itensNavegacao } from './itensNavegacao'
 
 /** Cada rota pode declarar `handle: { titulo }` para aparecer no cabeçalho do celular. */
@@ -60,6 +61,8 @@ export function AppLayout() {
           <p className={cn('text-lg font-semibold', !handle?.voltar && 'px-2')}>{titulo}</p>
         </div>
       </header>
+
+      <AvisoOffline />
 
       {/* Espaço extra embaixo no celular para a barra fixa e a área segura do iPhone */}
       <div className="mx-auto w-full max-w-3xl px-4 py-6 pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:px-8 md:py-10 md:pb-10">

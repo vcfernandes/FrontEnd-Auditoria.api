@@ -1,7 +1,7 @@
 import { ChevronRight, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router'
-import { useAuditoria, useExcluirAuditoria, type AuditoriaResumo } from '@/api/auditorias'
+import { useExcluirAuditoria, type AuditoriaResumo } from '@/api/auditorias'
 import { ApiError } from '@/api/client'
 import {
   AlertDialog,
@@ -18,13 +18,7 @@ import { CLASSIFICACOES } from '@/lib/classificacao'
 import { formatarData, formatarNota } from '@/lib/formatadores'
 import { cn } from '@/lib/utils'
 
-/** A lista não traz o resumo: busca o detalhe (que também deixa a tela de responder pronta no cache). */
-function Progresso({ id }: { id: string }) {
-  const auditoria = useAuditoria(id)
-  const resumo = auditoria.data?.resumo
-
-  if (!resumo) return <div className="mt-2 h-4 w-32 animate-pulse rounded bg-muted" aria-hidden />
-
+function Progresso({ resumo }: { resumo: NonNullable<AuditoriaResumo['resumo']> }) {
   const total = resumo.total ?? 0
   const respondidas = resumo.respondidas ?? 0
   return (
@@ -106,7 +100,7 @@ export function AuditoriaCard({ auditoria }: { auditoria: AuditoriaResumo }) {
           <p className="truncate text-sm text-muted-foreground">
             {formatarData(auditoria.dataAuditoria)} · {auditoria.modeloNome}
           </p>
-          {emAndamento && <Progresso id={auditoria.id!} />}
+          {emAndamento && auditoria.resumo && <Progresso resumo={auditoria.resumo} />}
         </div>
         {!emAndamento && (
           <div className="flex shrink-0 flex-col items-end gap-1">

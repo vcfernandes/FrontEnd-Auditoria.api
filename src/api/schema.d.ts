@@ -426,6 +426,8 @@ export interface components {
             descricao?: string;
             biblioteca?: boolean;
             ativo?: boolean;
+            /** Format: int32 */
+            quantidadePerguntas?: number;
             /** Format: date-time */
             criadoEm?: string;
             /** Format: date-time */
@@ -438,6 +440,9 @@ export interface components {
             email?: string;
             /** @enum {string} */
             papel?: "ADMIN" | "AUDITOR";
+            /** Format: uuid */
+            organizacaoId?: string;
+            organizacaoNome?: string;
         };
         AuditoriaResumoResponse: {
             /** Format: uuid */
@@ -462,6 +467,7 @@ export interface components {
             finalizadaEm?: string;
             /** Format: date-time */
             criadoEm?: string;
+            resumo?: components["schemas"]["ResumoRespostasResponse"];
         };
         PagedModelAuditoriaResumoResponse: {
             content: components["schemas"]["AuditoriaResumoResponse"][];

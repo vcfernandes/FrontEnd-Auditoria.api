@@ -69,6 +69,8 @@ export function useSalvamentoRespostas(id: string) {
       new FilaRespostas(async (respostas: RespostaEnvio[]) => {
         const auditoria = await api.put<Auditoria>(`/auditorias/${id}/respostas`, { respostas })
         queryClient.setQueryData(chaveDetalhe(id), auditoria)
+        // O progresso do cartão do histórico vem da lista: marca como desatualizada (recarrega ao voltar para lá).
+        void queryClient.invalidateQueries({ queryKey: ['auditorias', 'lista'] })
       }),
   )
   const estado = useSyncExternalStore(fila.assinar, fila.obterEstado)

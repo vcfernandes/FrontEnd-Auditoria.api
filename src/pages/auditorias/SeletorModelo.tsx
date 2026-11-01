@@ -34,6 +34,11 @@ export function ListaModelos({ valor, onChange, modelos }: Props) {
                 <span className="font-medium">{modelo.nome}</span>
                 {modelo.biblioteca && <Badge variant="secondary">Biblioteca</Badge>}
               </div>
+              {modelo.quantidadePerguntas !== undefined && (
+                <p className="mt-0.5 text-sm text-muted-foreground tabular-nums">
+                  {modelo.quantidadePerguntas} {modelo.quantidadePerguntas === 1 ? 'pergunta' : 'perguntas'}
+                </p>
+              )}
               {modelo.descricao && (
                 <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{modelo.descricao}</p>
               )}

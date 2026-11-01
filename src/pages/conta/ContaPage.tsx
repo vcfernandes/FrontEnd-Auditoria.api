@@ -3,8 +3,7 @@ import { ApiError } from '@/api/client'
 import { useAuth } from '@/auth/useAuth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-
-const PAPEIS: Record<string, string> = { ADMIN: 'Administrador', AUDITOR: 'Auditor' }
+import { InstalarApp } from './InstalarApp'
 
 function Dado({ rotulo, valor }: { rotulo: string; valor?: string }) {
   return (
@@ -22,7 +21,8 @@ export function ContaPage() {
   // Mostra já o que está na sessão e atualiza com o que vier de GET /auth/me.
   const nome = me.data?.nome ?? sessao?.usuario.nome
   const email = me.data?.email ?? sessao?.usuario.email
-  const papel = me.data?.papel ?? sessao?.usuario.papel
+  // A organização só vem do /auth/me (a sessão do login não tem esse dado).
+  const organizacao = me.data?.organizacaoNome
 
   return (
     <section className="flex flex-col gap-6">
@@ -32,7 +32,7 @@ export function ContaPage() {
           <dl className="flex flex-col gap-4">
             <Dado rotulo="Nome" valor={nome} />
             <Dado rotulo="E-mail" valor={email} />
-            <Dado rotulo="Perfil" valor={papel ? (PAPEIS[papel] ?? papel) : undefined} />
+            <Dado rotulo="Organização" valor={organizacao ?? (me.isPending ? 'Carregando…' : undefined)} />
           </dl>
         </CardContent>
       </Card>
@@ -41,6 +41,7 @@ export function ContaPage() {
           {me.error instanceof ApiError ? me.error.message : 'Não foi possível atualizar seus dados.'}
         </p>
       )}
+      <InstalarApp />
       <Button variant="outline" size="lg" className="h-12 text-base" onClick={sair}>
         Sair
       </Button>

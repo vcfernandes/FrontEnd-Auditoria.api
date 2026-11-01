@@ -11,6 +11,7 @@ import { ContaPage } from '@/pages/conta/ContaPage'
 import { CriarContaPage } from '@/pages/criar-conta/CriarContaPage'
 import { EntrarPage } from '@/pages/entrar/EntrarPage'
 import { NaoEncontradaPage } from '@/pages/nao-encontrada/NaoEncontradaPage'
+import { AvisoAtualizacao } from '@/pwa/AvisoAtualizacao'
 
 const router = createBrowserRouter([
   {
@@ -63,5 +64,10 @@ const router = createBrowserRouter([
 ])
 
 export default function App() {
-  return <RouterProvider router={router} />
+  return (
+    <>
+      <RouterProvider router={router} />
+      <AvisoAtualizacao />
+    </>
+  )
 }
