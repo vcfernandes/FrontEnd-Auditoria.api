@@ -85,6 +85,24 @@ export function useSalvamentoRespostas(id: string) {
   return { fila, estado }
 }
 
+/** PDF do relatório (só auditoria finalizada). Baixado com o token, como blob. */
+export function useRelatorioPdf(id: string) {
+  return useMutation({
+    mutationFn: () => api.arquivo(`/auditorias/${id}/relatorio.pdf`),
+  })
+}
+
+export function useReabrirAuditoria(id: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => api.post<Auditoria>(`/auditorias/${id}/reabrir`),
+    onSuccess: (auditoria) => {
+      queryClient.setQueryData(chaveDetalhe(id), auditoria)
+      return queryClient.invalidateQueries({ queryKey: ['auditorias', 'lista'] })
+    },
+  })
+}
+
 export function useFinalizarAuditoria(id: string) {
   const queryClient = useQueryClient()
   return useMutation({

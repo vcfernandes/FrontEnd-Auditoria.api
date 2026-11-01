@@ -59,9 +59,14 @@ async function lerErro(resposta: Response): Promise<ApiError> {
   }
 }
 
-async function request<T>(caminho: string, { method = 'GET', params, body, signal }: Opcoes = {}): Promise<T> {
+/** Faz a chamada com token e trata erros no formato da API; devolve a resposta já validada. */
+async function executar(
+  caminho: string,
+  { method = 'GET', params, body, signal }: Opcoes,
+  accept: string,
+): Promise<Response> {
   const token = lerSessao()?.token
-  const headers: Record<string, string> = { Accept: 'application/json' }
+  const headers: Record<string, string> = { Accept: accept }
   if (body !== undefined) headers['Content-Type'] = 'application/json'
   if (token) headers.Authorization = `Bearer ${token}`
 
@@ -83,10 +88,41 @@ async function request<T>(caminho: string, { method = 'GET', params, body, signa
     if (resposta.status === 401 && token) limparSessao()
     throw await lerErro(resposta)
   }
+  return resposta
+}
 
+async function request<T>(caminho: string, opcoes: Opcoes = {}): Promise<T> {
+  const resposta = await executar(caminho, opcoes, 'application/json')
   if (resposta.status === 204) return undefined as T
   const texto = await resposta.text()
   return (texto ? JSON.parse(texto) : undefined) as T
+}
+
+/** Extrai o nome do arquivo de `Content-Disposition` (aceita `filename*=UTF-8''...` e `filename="..."`). */
+function nomeDoArquivo(disposicao: string | null) {
+  if (!disposicao) return null
+  const codificado = /filename\*\s*=\s*(?:UTF-8'')?([^;]+)/i.exec(disposicao)
+  if (codificado) {
+    try {
+      return decodeURIComponent(codificado[1].trim().replace(/^"|"$/g, ''))
+    } catch {
+      // segue para o filename simples
+    }
+  }
+  const simples = /filename\s*=\s*("?)([^";]+)\1/i.exec(disposicao)
+  return simples ? simples[2].trim() : null
+}
+
+export interface ArquivoBaixado {
+  blob: Blob
+  /** Nome sugerido pelo servidor (`Content-Disposition`), quando houver. */
+  nome: string | null
+}
+
+/** Baixa um arquivo autenticado (ex.: PDF) como blob — não dá para usar link direto por causa do token. */
+async function arquivo(caminho: string, opcoes: Omit<Opcoes, 'method' | 'body'> = {}): Promise<ArquivoBaixado> {
+  const resposta = await executar(caminho, opcoes, 'application/pdf, application/json')
+  return { blob: await resposta.blob(), nome: nomeDoArquivo(resposta.headers.get('Content-Disposition')) }
 }
 
 export const api = {
@@ -97,4 +133,5 @@ export const api = {
     request<T>(caminho, { ...opcoes, method: 'PUT', body }),
   delete: <T = void>(caminho: string, opcoes?: Omit<Opcoes, 'method' | 'body'>) =>
     request<T>(caminho, { ...opcoes, method: 'DELETE' }),
+  arquivo,
 }

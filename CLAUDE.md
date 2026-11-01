@@ -113,9 +113,10 @@ Navegação no celular: barra inferior (Auditorias, Clientes, Conta). No computa
 - [x] Histórico (antecipado): lista em `/auditorias` abaixo de "Nova auditoria", abas Em andamento (padrão) / Finalizadas e filtro opcional por cliente, guardados na URL (`?status=finalizadas&cliente=<id>`). Cartão: cliente, modelo, data; em andamento mostra progresso e abre `/responder` (com Excluir + confirmação); finalizada mostra nota e classificação e abre `/resultado`. "Carregar mais", estados vazio/carregamento. A ordem (mais recentes primeiro) vem da API.
   - `GET /auditorias` não traz o `resumo`: cada cartão em andamento busca `GET /auditorias/{id}` para o progresso (também deixa a tela de responder pronta no cache). Melhor seria o backend incluir `resumo` em `AuditoriaResumoResponse`.
   - Data padrão da Nova auditoria: `hojeIso()` estava correto; o banco mostrou datas 15/10 e 16/10 enviadas pelo front em auditorias criadas em 31/10, provavelmente preenchimento automático do navegador. Campo e formulário agora com `autoComplete="off"` e aviso "Não é a data de hoje · Usar hoje".
+- [x] Resultado + PDF (`src/pages/auditorias/resultado`): nota, classificação com a cor da faixa, resumo, lista de Não conformidades por seção (pergunta, observação, referência legal; mensagem positiva se não houver), Baixar PDF, Reabrir com confirmação (volta para responder). Em andamento redireciona para `/responder`.
+  - PDF: `api.arquivo()` em `src/api/client.ts` baixa com token como blob e lê o nome do `Content-Disposition` (o CORS do backend já expõe esse header). Computador: baixa direto. Celular (`pointer: coarse`): abre a folha de compartilhar (`navigator.share` com o arquivo); como o Safari pode recusar o compartilhamento depois da espera do download, ficam os botões Compartilhar / Abrir PDF para um novo toque (`src/lib/arquivo.ts`).
 
 ### Protótipo (fazer agora, nesta ordem)
-- [ ] Resultado + PDF
 - [ ] PWA: manifesto, ícones, instalação
 
 ### Depois do protótipo (backlog)
