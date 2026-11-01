@@ -104,9 +104,14 @@ Navegação no celular: barra inferior (Auditorias, Clientes, Conta). No computa
   - Não verificado contra a API: se limpar o CNPJ/categoria na edição (campo omitido no PUT) realmente apaga o valor no backend.
 - [x] Nova auditoria: botão "Nova auditoria" em `/auditorias` (`BotaoNovo`: flutuante no celular, no topo no computador; a lista fica para o Histórico). `/auditorias/nova`: cliente (busca + escolha; sem clientes, atalho para cadastrar), modelo (`GET /checklists`, só ativos, etiqueta "Biblioteca", pré-seleciona se houver um único), data (hoje) e observações; `POST /auditorias` e vai para `/auditorias/{id}/responder` (página provisória com cliente, modelo e resumo). Hooks em `src/api/auditorias.ts` e `src/api/checklists.ts`.
   - `GET /checklists` não informa a quantidade de perguntas, então ela não aparece na lista de modelos.
+- [x] Responder auditoria (`src/pages/auditorias/responder`): topo fixo (cliente, progresso, obrigatórias faltando, indicador de salvamento, filtro "Só pendentes"), seções recolhíveis com "x/y", perguntas com 3 botões grandes (tocar de novo limpa) e observação (abre sozinha em Não conforme), Finalizar fixo no rodapé (salva antes, confirma; 422 rola até a 1ª obrigatória pendente e a destaca). Finalizada redireciona para `/auditorias/{id}/resultado` (página provisória com nota e classificação).
+  - Salvamento automático: `src/lib/filaRespostas.ts` (sem React) junta alterações por pergunta, envia em lote 800 ms após a última, devolve o lote à fila se falhar e reenvia sozinho (2 s, 4 s… até 30 s; também ao voltar a rede). 4xx não reenvia sozinho. Ligada ao React por `useSalvamentoRespostas` em `src/api/auditorias.ts`.
+  - Cada envio leva o par completo da pergunta (`resposta` + `observacao`, `null` quando vazio).
+  - Sair com algo não salvo: `useBlocker` tenta salvar e só sai quando terminar (ou se o usuário escolher sair sem salvar após erro); `beforeunload` avisa ao fechar/recarregar.
+  - Desempenho: perguntas com `memo` e callbacks estáveis; seções fechadas não renderizam perguntas.
+  - Respostas não salvas ficam só na memória: recarregar à força ou 401 durante uma falha perde o que não foi enviado (modo offline está no backlog).
 
 ### Protótipo (fazer agora, nesta ordem)
-- [ ] Responder auditoria
 - [ ] Resultado + PDF
 - [ ] Histórico
 - [ ] PWA: manifesto, ícones, instalação

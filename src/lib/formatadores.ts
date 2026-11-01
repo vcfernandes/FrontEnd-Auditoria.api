@@ -21,6 +21,12 @@ export function hojeIso() {
   return `${agora.getFullYear()}-${mes}-${dia}`
 }
 
+/** Nota com vírgula e duas casas: 69,23. */
+export function formatarNota(nota?: number) {
+  if (nota === undefined || nota === null) return '—'
+  return nota.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
 /** Converte aaaa-mm-dd em dd/mm/aaaa sem passar por Date (evita deslocar o dia por fuso). */
 export function formatarData(iso?: string) {
   if (!iso) return ''
