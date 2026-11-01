@@ -99,6 +99,17 @@ Navegação no celular: barra inferior (Início, Auditorias, Clientes, Conta). N
 - Fundo das telas internas `bg-muted/40` com cartões brancos (`bg-card`).
 - Ícones do app/PWA: prancheta com check em fundo `#1e3a5f` (`public/icon.svg`; regenerar com `npm run generate-pwa-assets`).
 
+## Publicação
+
+- **Caddy** na frente: serve o `dist/` na raiz e repassa `/api/*` para a API **removendo o `/api`**. Front e API na mesma origem (sem CORS em produção).
+- O Caddy precisa do fallback de SPA (rotas como `/auditorias/123/resultado` devolvem `index.html`), porque o app usa `createBrowserRouter` (histórico do navegador) com `base` do Vite em `/` (padrão, não configurado).
+- **Build**: `npm ci` + `npm run build` → `dist/`. Testado com Node 22 (clone limpo do repositório); o Vite 8 exige Node ≥ 22.12 (ou 20.19+). O `package-lock.json` é versionado e deve ser commitado junto com qualquer mudança no `package.json`.
+- **URL da API**: só de `import.meta.env.VITE_API_URL`; `montarUrl` (`src/api/client.ts`) concatena base + caminho + query, então funciona com valor relativo. `.env.production` (**versionado**, `VITE_API_URL=/api`) é o que o build usa; o `.env` (desenvolvimento) não é versionado, e sem o `.env.production` o build sairia sem URL da API. `localhost:8080` só aparece no proxy de desenvolvimento (`vite.config.ts`) e no script `gen:api`.
+- Variáveis `VITE_*` vão para o JavaScript público: **nunca** colocar segredos nelas (hoje só existe `VITE_API_URL`).
+- PDF: baixado por `fetch` com `Authorization` e lido como blob (`api.arquivo()`), nunca por link direto.
+- Service worker: só pré-carrega arquivos do build; nenhum `runtimeCaching`, e `/api/` fica fora do fallback de navegação (conferido no `dist/sw.js`).
+- `public/login.jpg` (1,6 MB, sem uso; a tela usa `login.webp`) vai para o `dist/` mas não para o cache do service worker.
+
 ## Status
 
 ### Feito
@@ -146,6 +157,7 @@ Navegação no celular: barra inferior (Início, Auditorias, Clientes, Conta). N
   - Ao trocar de aba os filtros de Realizadas continuam no endereço. A seta "voltar" do cabeçalho e os links "Voltar"/"Cancelar" das telas de auditoria usam o último endereço da lista (`src/lib/ultimaLista.ts`, só em memória; recarregar a página perde).
   - **Meus modelos** (`modelos/`): modelos da organização ativos (nome, descrição, nº de perguntas). Ver perguntas (painel `src/components/ui/dialog.tsx`, só leitura, seções e perguntas numeradas com "Obrigatória" e referência legal; `GET /checklists/{id}` só ao abrir), Iniciar (`/auditorias/nova?modeloId=`, já marcado), menu "⋯" com Duplicar e Inativar (confirmação, `DELETE /checklists/{id}`). Vazio: sugere duplicar da Biblioteca.
   - **Biblioteca**: modelos padrão com etiqueta "Biblioteca": Ver perguntas, Duplicar (`POST /checklists/{id}/duplicar`, depois vai para Meus modelos) e Iniciar. Ainda não há editor de modelos (backlog): a cópia é idêntica, com o nome dado pelo backend.
+- [x] Preparação para publicação atrás do Caddy (ver "Publicação"): `.env.production` com `VITE_API_URL=/api`; `montarUrl` passou de `new URL(..., origin)` para concatenação simples. O resto já estava conforme.
 
 ### Protótipo (fazer agora, nesta ordem)
 

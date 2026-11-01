@@ -36,15 +36,14 @@ interface Opcoes {
   signal?: AbortSignal
 }
 
+/** Base + caminho por concatenação: funciona com base relativa (/api) ou absoluta. */
 function montarUrl(caminho: string, params?: Params) {
-  // API_URL pode ser relativa (/api, via proxy do Vite) ou absoluta.
-  const url = new URL(API_URL.replace(/\/$/, '') + caminho, window.location.origin)
+  const busca = new URLSearchParams()
   for (const [chave, valor] of Object.entries(params ?? {})) {
-    if (valor !== undefined && valor !== null && valor !== '') {
-      url.searchParams.set(chave, String(valor))
-    }
+    if (valor !== undefined && valor !== null && valor !== '') busca.set(chave, String(valor))
   }
-  return url
+  const query = busca.toString()
+  return API_URL.replace(/\/$/, '') + caminho + (query ? `?${query}` : '')
 }
 
 async function lerErro(resposta: Response): Promise<ApiError> {
