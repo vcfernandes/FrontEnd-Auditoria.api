@@ -1,4 +1,4 @@
-import { ClipboardList, UserRound, Users, type LucideIcon } from 'lucide-react'
+import { ClipboardList, House, UserRound, Users, type LucideIcon } from 'lucide-react'
 
 export interface ItemNavegacao {
   rotulo: string
@@ -7,6 +7,7 @@ export interface ItemNavegacao {
 }
 
 export const itensNavegacao: ItemNavegacao[] = [
+  { rotulo: 'Início', caminho: '/inicio', icone: House },
   { rotulo: 'Auditorias', caminho: '/auditorias', icone: ClipboardList },
   { rotulo: 'Clientes', caminho: '/clientes', icone: Users },
   { rotulo: 'Conta', caminho: '/conta', icone: UserRound },

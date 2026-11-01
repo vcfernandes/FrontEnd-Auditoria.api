@@ -1,15 +1,28 @@
+import { Building2, LogOut, Mail, UserRound, type LucideIcon } from 'lucide-react'
 import { useMe } from '@/api/auth'
 import { ApiError } from '@/api/client'
 import { useAuth } from '@/auth/useAuth'
+import { IconeQuadrado } from '@/components/IconeQuadrado'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { InstalarApp } from './InstalarApp'
 
-function Dado({ rotulo, valor }: { rotulo: string; valor?: string }) {
+function Dado({ icone, rotulo, valor, carregando = false }: {
+  icone: LucideIcon
+  rotulo: string
+  valor?: string
+  carregando?: boolean
+}) {
   return (
-    <div className="flex flex-col gap-0.5">
-      <dt className="text-sm text-muted-foreground">{rotulo}</dt>
-      <dd className="break-words font-medium">{valor || '—'}</dd>
+    <div className="flex items-center gap-3">
+      <IconeQuadrado icone={icone} />
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <dt className="text-sm text-muted-foreground">{rotulo}</dt>
+        <dd className="font-medium break-words">
+          {carregando ? <Skeleton className="h-5 w-40" aria-label="Carregando" /> : valor || '—'}
+        </dd>
+      </div>
     </div>
   )
 }
@@ -26,13 +39,13 @@ export function ContaPage() {
 
   return (
     <section className="flex flex-col gap-6">
-      <h1 className="sr-only text-2xl font-semibold md:not-sr-only">Conta</h1>
+      <h1 className="sr-only">Conta</h1>
       <Card>
         <CardContent>
-          <dl className="flex flex-col gap-4">
-            <Dado rotulo="Nome" valor={nome} />
-            <Dado rotulo="E-mail" valor={email} />
-            <Dado rotulo="Organização" valor={organizacao ?? (me.isPending ? 'Carregando…' : undefined)} />
+          <dl className="flex flex-col gap-5">
+            <Dado icone={UserRound} rotulo="Nome" valor={nome} />
+            <Dado icone={Mail} rotulo="E-mail" valor={email} />
+            <Dado icone={Building2} rotulo="Organização" valor={organizacao} carregando={me.isPending} />
           </dl>
         </CardContent>
       </Card>
@@ -43,6 +56,7 @@ export function ContaPage() {
       )}
       <InstalarApp />
       <Button variant="outline" size="lg" className="h-12 text-base" onClick={sair}>
+        <LogOut aria-hidden />
         Sair
       </Button>
     </section>

@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { Link, useNavigate, useParams } from 'react-router'
@@ -9,11 +8,13 @@ import {
   useCriarCliente,
   useEditarCliente,
   useInativarCliente,
+  useReativarCliente,
   type Cliente,
   type ClienteDados,
 } from '@/api/clientes'
 import { ApiError } from '@/api/client'
 import { CampoTexto } from '@/components/CampoTexto'
+import { EsqueletoFormulario } from '@/components/Esqueletos'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -84,6 +85,32 @@ function InativarCliente({ cliente }: { cliente: Cliente }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
+  )
+}
+
+function ReativarCliente({ cliente }: { cliente: Cliente }) {
+  const reativar = useReativarCliente(cliente.id!)
+  const [erro, setErro] = useState<string | null>(null)
+
+  return (
+    <div className="flex flex-col gap-3 border-t pt-6">
+      {erro && <MensagemGeral texto={erro} />}
+      <Button
+        type="button"
+        variant="outline"
+        size="lg"
+        className="h-12 text-base"
+        disabled={reativar.isPending}
+        onClick={() => {
+          setErro(null)
+          reativar.mutate(undefined, {
+            onError: (e) => setErro(e instanceof ApiError ? e.message : 'Não foi possível reativar o cliente.'),
+          })
+        }}
+      >
+        {reativar.isPending ? 'Reativando…' : 'Reativar cliente'}
+      </Button>
     </div>
   )
 }
@@ -200,7 +227,7 @@ function ClienteForm({ cliente }: { cliente?: Cliente }) {
         <Link to="/clientes">Cancelar</Link>
       </Button>
 
-      {cliente && <InativarCliente cliente={cliente} />}
+      {cliente && (cliente.ativo !== false ? <InativarCliente cliente={cliente} /> : <ReativarCliente cliente={cliente} />)}
     </form>
   )
 }
@@ -211,18 +238,10 @@ export function ClienteFormPage() {
 
   return (
     <section className="flex flex-col gap-6">
-      <div className="hidden items-center gap-3 md:flex">
-        <Button asChild variant="ghost" size="icon-lg" aria-label="Voltar para clientes">
-          <Link to="/clientes">
-            <ArrowLeft aria-hidden />
-          </Link>
-        </Button>
-        <h1 className="text-2xl font-semibold">{id ? 'Editar cliente' : 'Novo cliente'}</h1>
-      </div>
-      <h1 className="sr-only md:hidden">{id ? 'Editar cliente' : 'Novo cliente'}</h1>
+      <h1 className="sr-only">{id ? 'Editar cliente' : 'Novo cliente'}</h1>
 
       {!id && <ClienteForm />}
-      {id && cliente.isPending && <div className="h-64 animate-pulse rounded-xl bg-muted" aria-busy />}
+      {id && cliente.isPending && <EsqueletoFormulario campos={3} />}
       {id && cliente.isError && (
         <div role="alert" className="flex flex-col items-start gap-3">
           <p className="text-destructive">

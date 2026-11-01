@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'
+import { Loader2, PartyPopper } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useBlocker, useNavigate } from 'react-router'
@@ -19,6 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { EstadoVazio } from '@/components/EstadoVazio'
 import { Button } from '@/components/ui/button'
 import type { RespostaLocal, ValorResposta } from '@/lib/filaRespostas'
 import { BarraProgresso } from './BarraProgresso'
@@ -202,14 +203,17 @@ export function Questionario({ auditoria }: { auditoria: Auditoria }) {
         )
       })}
       {visiveis && visiveis.size === 0 && (
-        <p className="rounded-xl border border-dashed p-6 text-center text-muted-foreground">
-          Nenhuma pergunta pendente. 🎉
-        </p>
+        <EstadoVazio
+          icone={PartyPopper}
+          tom="sucesso"
+          titulo="Nenhuma pergunta pendente"
+          descricao="Tudo respondido. Confira as respostas ou finalize a auditoria."
+        />
       )}
 
       {/* Rodapé fixo: acima da barra de navegação no celular */}
       <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-10 border-t bg-background/95 px-4 py-3 backdrop-blur md:bottom-0 md:left-60 md:px-8">
-        <div className="mx-auto flex max-w-3xl flex-col gap-2">
+        <div className="flex max-w-4xl flex-col gap-2">
           {erroFinalizar && (
             <p role="alert" className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {erroFinalizar}

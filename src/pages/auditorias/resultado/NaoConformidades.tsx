@@ -1,5 +1,6 @@
 import { PartyPopper } from 'lucide-react'
 import type { Auditoria } from '@/api/auditorias'
+import { EstadoVazio } from '@/components/EstadoVazio'
 
 const porOrdem = (a: { ordem?: number }, b: { ordem?: number }) => (a.ordem ?? 0) - (b.ordem ?? 0)
 
@@ -24,11 +25,13 @@ export function NaoConformidades({ auditoria }: { auditoria: Auditoria }) {
       </h2>
 
       {total === 0 && (
-        <div className="flex flex-col items-center gap-2 rounded-xl border border-emerald-600/30 bg-emerald-600/5 p-6 text-center">
-          <PartyPopper className="size-8 text-emerald-600" aria-hidden />
-          <p className="font-medium">Nenhuma não conformidade!</p>
-          <p className="text-sm text-muted-foreground">Todos os itens avaliados estão conformes.</p>
-        </div>
+        <EstadoVazio
+          icone={PartyPopper}
+          tom="sucesso"
+          titulo="Nenhuma não conformidade!"
+          descricao="Todos os itens avaliados estão conformes. Parabéns ao estabelecimento."
+          className="border-emerald-600/30"
+        />
       )}
 
       {grupos.map((grupo) => (

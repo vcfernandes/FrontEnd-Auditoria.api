@@ -1,18 +1,20 @@
 import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { api, type Schemas } from './client'
 
 export type Cliente = Schemas['ClienteResponse']
 export type ClienteDados = Schemas['ClienteRequest']
+export type StatusCliente = 'ATIVO' | 'INATIVO' | 'TODOS'
 
 const TAMANHO_PAGINA = 20
 
-export function useClientes(nome: string) {
+export function useClientes(nome: string, status: StatusCliente = 'ATIVO') {
   return useInfiniteQuery({
-    queryKey: ['clientes', 'lista', nome],
+    queryKey: ['clientes', 'lista', nome, status],
     initialPageParam: 0,
     queryFn: ({ pageParam, signal }) =>
       api.get<Schemas['PagedModelClienteResponse']>('/clientes', {
-        params: { nome, page: pageParam, size: TAMANHO_PAGINA },
+        params: { nome, status, page: pageParam, size: TAMANHO_PAGINA },
         signal,
       }),
     getNextPageParam: ({ page }) => (page.number + 1 < page.totalPages ? page.number + 1 : undefined),
@@ -33,7 +35,10 @@ export function useCriarCliente() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (dados: ClienteDados) => api.post<Cliente>('/clientes', dados),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['clientes'] }),
+    onSuccess: () => {
+      toast.success('Cliente cadastrado.')
+      return queryClient.invalidateQueries({ queryKey: ['clientes'] })
+    },
   })
 }
 
@@ -41,7 +46,10 @@ export function useEditarCliente(id: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (dados: ClienteDados) => api.put<Cliente>(`/clientes/${id}`, dados),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['clientes'] }),
+    onSuccess: () => {
+      toast.success('Cliente atualizado.')
+      return queryClient.invalidateQueries({ queryKey: ['clientes'] })
+    },
   })
 }
 
@@ -50,8 +58,21 @@ export function useInativarCliente(id: string) {
   return useMutation({
     mutationFn: () => api.delete(`/clientes/${id}`),
     onSuccess: () => {
-      // O cliente some da lista; o detalhe antigo não deve mais ser buscado.
+      toast.success('Cliente inativado.')
+      // O detalhe antigo não deve mais ser buscado (ex.: formulário aberto na aba Ativos).
       queryClient.removeQueries({ queryKey: ['clientes', 'detalhe', id] })
+      return queryClient.invalidateQueries({ queryKey: ['clientes'] })
+    },
+  })
+}
+
+export function useReativarCliente(id: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => api.post<Cliente>(`/clientes/${id}/reativar`),
+    onSuccess: (cliente) => {
+      toast.success('Cliente reativado.')
+      queryClient.setQueryData(['clientes', 'detalhe', id], cliente)
       return queryClient.invalidateQueries({ queryKey: ['clientes'] })
     },
   })

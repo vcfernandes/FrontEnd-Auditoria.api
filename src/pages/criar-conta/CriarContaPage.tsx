@@ -39,7 +39,7 @@ export function CriarContaPage() {
     registrar.mutate(
       { nomeOrganizacao, nome, email, senha },
       {
-        onSuccess: () => navigate('/', { replace: true }),
+        onSuccess: () => navigate('/inicio', { replace: true }),
         onError: (erro) =>
           setErroGeral(aplicarErroApi(erro, setError, ['nomeOrganizacao', 'nome', 'email', 'senha'])),
       },
@@ -89,7 +89,7 @@ export function CriarContaPage() {
       </form>
       <p className="text-center text-sm text-muted-foreground">
         Já tem conta?{' '}
-        <Link to="/entrar" className="font-medium text-foreground underline underline-offset-4">
+        <Link to="/entrar" className="font-medium text-primary underline underline-offset-4">
           Entrar
         </Link>
       </p>

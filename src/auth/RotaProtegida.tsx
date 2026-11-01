@@ -9,5 +9,5 @@ export function RotaProtegida() {
 /** Telas de entrada: quem já tem sessão vai direto para a página inicial. */
 export function RotaPublica() {
   const { sessao } = useAuth()
-  return sessao ? <Navigate to="/" replace /> : <Outlet />
+  return sessao ? <Navigate to="/inicio" replace /> : <Outlet />
 }

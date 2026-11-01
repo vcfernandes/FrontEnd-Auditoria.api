@@ -1,3 +1,4 @@
+import { toast } from 'sonner'
 import { lerSessao, limparSessao } from '@/auth/session'
 import type { components } from './schema'
 
@@ -80,7 +81,9 @@ async function executar(
     })
   } catch (erro) {
     if (erro instanceof DOMException && erro.name === 'AbortError') throw erro
-    throw new ApiError(0, 'Não foi possível conectar ao servidor. Verifique sua internet.')
+    const mensagem = 'Não foi possível conectar ao servidor. Verifique sua internet.'
+    toast.error(mensagem)
+    throw new ApiError(0, mensagem)
   }
 
   if (!resposta.ok) {

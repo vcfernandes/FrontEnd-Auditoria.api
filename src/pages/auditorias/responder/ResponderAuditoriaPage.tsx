@@ -1,6 +1,7 @@
 import { Link, Navigate, useParams } from 'react-router'
 import { useAuditoria } from '@/api/auditorias'
 import { ApiError } from '@/api/client'
+import { EsqueletoQuestionario } from '@/components/Esqueletos'
 import { Button } from '@/components/ui/button'
 import { Questionario } from './Questionario'
 
@@ -9,14 +10,7 @@ export function ResponderAuditoriaPage() {
   const auditoria = useAuditoria(id)
 
   if (auditoria.isPending) {
-    return (
-      <div className="flex flex-col gap-3" aria-busy aria-label="Carregando auditoria">
-        <div className="h-24 animate-pulse rounded-xl bg-muted" />
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="h-40 animate-pulse rounded-xl bg-muted" />
-        ))}
-      </div>
-    )
+    return <EsqueletoQuestionario />
   }
 
   if (auditoria.isError) {

@@ -1,12 +1,14 @@
+import { ListChecks } from 'lucide-react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 import { z } from 'zod'
 import { useCriarAuditoria } from '@/api/auditorias'
 import { useChecklists } from '@/api/checklists'
-import type { Cliente } from '@/api/clientes'
+import { useCliente, type Cliente } from '@/api/clientes'
 import { CampoTexto } from '@/components/CampoTexto'
+import { EstadoVazio } from '@/components/EstadoVazio'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -37,6 +39,9 @@ export function NovaAuditoriaPage() {
   const navigate = useNavigate()
   const criar = useCriarAuditoria()
   const modelos = useChecklists()
+  // Vem do menu "⋯" de um cliente na lista (Nova auditoria para este cliente).
+  const [params] = useSearchParams()
+  const clientePreSelecionado = useCliente(params.get('clienteId') ?? undefined)
   const [cliente, setCliente] = useState<Cliente | null>(null)
   const [erroGeral, setErroGeral] = useState<string | null>(null)
 
@@ -68,6 +73,11 @@ export function NovaAuditoriaPage() {
     setValue('clienteId', novo?.id ?? '', { shouldValidate: !!novo })
   }
 
+  useEffect(() => {
+    if (clientePreSelecionado.data) escolherCliente(clientePreSelecionado.data)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clientePreSelecionado.data])
+
   const enviar = handleSubmit((dados) => {
     setErroGeral(null)
     criar.mutate(
@@ -87,7 +97,7 @@ export function NovaAuditoriaPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="sr-only text-2xl font-semibold md:not-sr-only">Nova auditoria</h1>
+      <h1 className="sr-only">Nova auditoria</h1>
 
       <form onSubmit={enviar} noValidate autoComplete="off" className="flex flex-col gap-8">
         <Secao titulo="Cliente" erro={errors.clienteId?.message}>
@@ -97,9 +107,11 @@ export function NovaAuditoriaPage() {
         <Secao titulo="Modelo de checklist" erro={errors.modeloId?.message}>
           <EstadoModelos consulta={modelos} />
           {modelos.isSuccess && lista.length === 0 && (
-            <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
-              Nenhum modelo de checklist disponível.
-            </p>
+            <EstadoVazio
+              icone={ListChecks}
+              titulo="Nenhum modelo de checklist disponível"
+              descricao="Os modelos da biblioteca (como a RDC 216) deveriam aparecer aqui. Tente recarregar a página."
+            />
           )}
           {lista.length > 0 && (
             <ListaModelos
@@ -124,7 +136,7 @@ export function NovaAuditoriaPage() {
                 {data ? 'Não é a data de hoje. ' : ''}
                 <button
                   type="button"
-                  className="min-h-10 font-medium text-foreground underline underline-offset-4"
+                  className="min-h-10 font-medium text-primary underline underline-offset-4"
                   onClick={() => setValue('data', hoje, { shouldValidate: true })}
                 >
                   Usar hoje ({formatarData(hoje)})

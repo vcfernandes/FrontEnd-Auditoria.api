@@ -77,8 +77,9 @@ O backend é outro repositório (`auditoria-api`, Java 21 + Spring Boot 4) e já
 4. **Responder auditoria**: perguntas agrupadas por seção, botões grandes Conforme / Não conforme / Não se aplica, observação por pergunta, **salvamento automático**, indicador de progresso (obrigatórias pendentes) e botão Finalizar
 5. **Resultado**: nota, classificação com a cor da faixa, resumo, botão Baixar PDF, botão Reabrir
 6. **Histórico**: lista de auditorias com filtro por status e cliente
+7. **Início (painel)**: resumo do dia, atalhos e últimas auditorias (`/inicio`)
 
-Navegação no celular: barra inferior (Auditorias, Clientes, Conta). No computador: menu lateral.
+Navegação no celular: barra inferior (Início, Auditorias, Clientes, Conta). No computador: menu lateral. Após o login: `/inicio` (painel).
 
 ## Convenções
 
@@ -88,6 +89,15 @@ Navegação no celular: barra inferior (Auditorias, Clientes, Conta). No computa
 - Datas exibidas em `dd/mm/aaaa`; notas com vírgula (`69,23`).
 - Componentes pequenos; sem lógica de API dentro de componentes de UI (usar os hooks de `src/api`).
 - Botões e áreas de toque grandes (uso com uma mão, em pé).
+
+### Tema e visual
+- **Cor principal: azul-marinho `#1E3A5F`** (`--primary` em `src/index.css`): botões, item ativo, links (`text-primary`), barra de progresso, seleção. Fundo suave dos ícones/destaques: `--primary-suave` (`#dde8f5`, classe `bg-primary-suave`), porque 10% do azul-marinho fica cinza. Cinzas levemente azulados (slate). O app não usa modo escuro (o bloco `.dark` é o padrão do shadcn, sem uso).
+- **Menu lateral (computador)**: fundo azul-marinho (`--sidebar`), texto claro, item ativo com fundo mais claro e filete à esquerda. **Cabeçalho do computador**: título da tela (de `handle.titulo`, com seta se `handle.voltar`) à esquerda e `MenuUsuario` (avatar de iniciais + nome; menu Conta / Sair) à direita. As páginas mantêm um `<h1 className="sr-only">` só para leitores de tela.
+- **Classificações**: Excelente `emerald-600`, **Bom `sky-500`** (azul-celeste, para não confundir com o azul-marinho), Regular `amber-400`, Inadequado `red-600` (`src/lib/classificacao.ts`). Botões de resposta: verde / vermelho / cinza.
+- **Telas de entrada** (`LayoutEntrada`): computador dividido ao meio (formulário à esquerda; à direita `public/login.webp`, versão otimizada de `public/login.jpg`, com camada `bg-primary/85` e só o título "Inspeções sanitárias sem papelada."); celular só o formulário com topo azul-marinho.
+- **Peças compartilhadas**: `IconeQuadrado` (ícone em quadrado com fundo suave; tons primário/sucesso/perigo/neutro) nos cartões; `EstadoVazio` (ícone grande + texto amigável + ação); `Esqueletos` (`EsqueletoCartoes`, `EsqueletoFormulario`, `EsqueletoQuestionario`, `EsqueletoResultado`) em todo carregamento — não usar só texto "Carregando…".
+- Fundo das telas internas `bg-muted/40` com cartões brancos (`bg-card`).
+- Ícones do app/PWA: prancheta com check em fundo `#1e3a5f` (`public/icon.svg`; regenerar com `npm run generate-pwa-assets`).
 
 ## Status
 
@@ -115,11 +125,23 @@ Navegação no celular: barra inferior (Auditorias, Clientes, Conta). No computa
   - Data padrão da Nova auditoria: `hojeIso()` estava correto; o banco mostrou datas 15/10 e 16/10 enviadas pelo front em auditorias criadas em 31/10, provavelmente preenchimento automático do navegador. Campo e formulário agora com `autoComplete="off"` e aviso "Não é a data de hoje · Usar hoje".
 - [x] Resultado + PDF (`src/pages/auditorias/resultado`): nota, classificação com a cor da faixa, resumo, lista de Não conformidades por seção (pergunta, observação, referência legal; mensagem positiva se não houver), Baixar PDF, Reabrir com confirmação (volta para responder). Em andamento redireciona para `/responder`.
   - PDF: `api.arquivo()` em `src/api/client.ts` baixa com token como blob e lê o nome do `Content-Disposition` (o CORS do backend já expõe esse header). Computador: baixa direto. Celular (`pointer: coarse`): abre a folha de compartilhar (`navigator.share` com o arquivo); como o Safari pode recusar o compartilhamento depois da espera do download, ficam os botões Compartilhar / Abrir PDF para um novo toque (`src/lib/arquivo.ts`).
-- [x] PWA: `vite-plugin-pwa` em `vite.config.ts` (nome e nome curto "Auditorias", pt-BR, standalone, retrato, tema branco `#ffffff`). Ícones: fonte `public/icon.svg` (ClipboardCheck do menu, fundo `#171717`); `npm run generate-pwa-assets` gera em `public/` os PNGs 64/192/512, o maskable 512, o apple-touch-icon 180 e o favicon.ico (config em `pwa-assets.config.ts`).
+- [x] PWA: `vite-plugin-pwa` em `vite.config.ts` (nome e nome curto "Auditorias", pt-BR, standalone, retrato, tema branco `#ffffff`). Ícones: fonte `public/icon.svg` (ClipboardCheck do menu, fundo azul-marinho `#1e3a5f`); `npm run generate-pwa-assets` gera em `public/` os PNGs 64/192/512, o maskable 512, o apple-touch-icon 180 e o favicon.ico (config em `pwa-assets.config.ts`).
   - Service worker (`generateSW`) só pré-carrega arquivos do app; **sem cache de dados da API** (nenhum `runtimeCaching`; `/api/` fora do fallback de navegação). Sem internet o app abre, mostra a faixa "Sem internet" (`src/pwa/AvisoOffline.tsx`) e as chamadas falham com a mensagem do cliente HTTP (`networkMode: 'always'` no TanStack Query, senão as telas ficariam carregando para sempre).
   - Atualização: `registerType: 'prompt'`; aviso fixo "Nova versão disponível" com Atualizar / Depois (`src/pwa/AvisoAtualizacao.tsx`), nunca recarrega sozinho. Procura versão nova de hora em hora.
   - Conta → "Instalar no celular" (`src/pages/conta/InstalarApp.tsx`, `src/pwa/instalacao.ts`): botão quando o navegador dispara `beforeinstallprompt`, passos do Safari no iPhone, ou instruções gerais.
   - Testar o PWA exige o build: `npm run build && npm run preview` (porta 4173, mesmo proxy e host). No `npm run dev` o service worker fica desligado. Instalação em celular só em HTTPS (ou `localhost`).
+- [x] Polimento visual (sem funcionalidade nova): tema azul-marinho, menu lateral escuro, cabeçalho do computador com menu do usuário, telas de entrada divididas com foto, ícones em quadrados, esqueletos e estados vazios (ver "Tema e visual").
+- [x] Painel inicial `/inicio` (`src/pages/inicio`), página após o login (`/` e `RotaPublica` levam para lá) e 1º item do menu ("Início"; barra do celular com 4 itens). Saudação com primeiro nome + data por extenso; 4 cartões (`GET /dashboard`): Em andamento, Finalizadas no mês, Clientes ativos, Nota média 90 dias (cor da faixa via `classificarNota` em `src/lib/classificacao.ts`, espelho das faixas do backend: ≥90/≥75/≥60); ações rápidas; "Continuar de onde parou" e "Últimas finalizadas" (até 5, `useAuditoriasRecentes`); distribuição por classificação (90 dias, só com finalizadas). Computador (≥1024 px, rota com `handle.larga`): cartões em linha e duas colunas; celular empilhado com cartões 2×2. Conta nova (sem clientes ou sem auditorias): bloco "Boas-vindas" com dois passos no lugar das ações rápidas.
+  - `useDashboard` usa `staleTime: 0` (busca de novo sempre que o painel abre) em vez de invalidar em cada mutação de clientes/auditorias.
+  - Cartões levam às listas: Finalizadas no mês e Nota média abrem `/auditorias?status=finalizadas&desde=aaaa-mm-dd` (novo filtro `dataInicio`, com chip removível na lista). **Diferença conhecida**: o painel conta pela data de finalização (`finalizadaEm`) e o filtro `dataInicio` da API usa a data da auditoria (`dataAuditoria`); uma auditoria de um mês finalizada no outro conta no painel e não aparece na lista filtrada.
+  - `/auditorias?dataFim&busca` ainda sem tela.
+- [x] Ajustes gerais e Clientes com abas/grade:
+  - Largura no computador: o conteúdo de `AppLayout` não fica mais centralizado (sem `mx-auto`) e os limites cresceram (`max-w-4xl`, ou `max-w-7xl` nas rotas `handle.larga`, hoje Início e Clientes) — acaba a faixa vazia entre o menu e o conteúdo em telas largas. O rodapé fixo de Responder auditoria foi ajustado para o mesmo alinhamento.
+  - Painel: "Classificações (90 dias)" passou para a coluna da esquerda, abaixo de "Continuar de onde parou" (equilibra com "Últimas finalizadas" à direita).
+  - Telas de entrada: formulário centralizado na vertical também no celular (antes só no computador).
+  - Toasts (`sonner`, `src/components/ui/sonner.tsx`, montado em `App.tsx`) após salvar/inativar/reativar cliente, iniciar/finalizar/reabrir auditoria, baixar PDF, e em todo erro de rede (status 0 do cliente HTTP) — ficam nos próprios hooks de `src/api`.
+  - Título da aba e favicon com o ícone da prancheta: já estavam prontos desde a etapa de PWA (não precisou mudar).
+  - Clientes (`src/pages/clientes`): abas Ativos (padrão) / Inativos / Todos (`GET /clientes?status`, guardada na URL); grade de 3 colunas no computador (`lg:grid-cols-3`) e lista no celular; cartão com `AvatarIniciais` (cor estável por nome, `src/components/AvatarIniciais.tsx`) e etiqueta Ativo/Inativo; menu "⋯" com Editar, Nova auditoria para este cliente (`/auditorias/nova?clienteId=`, pré-seleciona o cliente) e Inativar/Reativar; contador "Mostrando X de Y clientes". `useReativarCliente` (`POST /clientes/{id}/reativar`) criado; o formulário de edição também troca Inativar por Reativar quando o cliente já está inativo (antes só existia Inativar).
 
 ### Protótipo (fazer agora, nesta ordem)
 

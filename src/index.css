@@ -6,6 +6,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+    --color-primary-suave: var(--primary-suave);
     --font-heading: var(--font-sans);
     --font-sans: 'Geist Variable', sans-serif;
     --color-sidebar-ring: var(--sidebar-ring);
@@ -49,38 +50,42 @@
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
+    /* Tema Auditorias: azul-marinho #1E3A5F como cor principal; cinzas levemente azulados (slate). */
+    --background: #ffffff;
+    --foreground: #0f1b2d;
+    --card: #ffffff;
+    --card-foreground: #0f1b2d;
+    --popover: #ffffff;
+    --popover-foreground: #0f1b2d;
+    --primary: #1e3a5f;
+    --primary-foreground: #ffffff;
+    /* Fundo suave dos ícones e destaques (10% do azul-marinho fica cinza; este é um azul-claro de verdade) */
+    --primary-suave: #dde8f5;
+    --secondary: #eef2f7;
+    --secondary-foreground: #1e3a5f;
+    --muted: #f1f4f8;
+    --muted-foreground: #5b6b80;
+    --accent: #e8eef6;
+    --accent-foreground: #1e3a5f;
     --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+    --border: #e1e7ef;
+    --input: #d5dde8;
+    --ring: #1e3a5f;
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
     --chart-3: oklch(0.439 0 0);
     --chart-4: oklch(0.371 0 0);
     --chart-5: oklch(0.269 0 0);
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    /* Menu lateral (computador): fundo azul-marinho, texto claro */
+    --sidebar: #1e3a5f;
+    --sidebar-foreground: #c9d6e6;
+    --sidebar-primary: #ffffff;
+    --sidebar-primary-foreground: #1e3a5f;
+    --sidebar-accent: #2a4a73;
+    --sidebar-accent-foreground: #ffffff;
+    --sidebar-border: #2a4a73;
+    --sidebar-ring: #93b4d9;
 }
 
 .dark {

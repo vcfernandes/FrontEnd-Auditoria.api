@@ -1,4 +1,4 @@
-import { ChevronRight, Trash2 } from 'lucide-react'
+import { ChevronRight, ClipboardCheck, ClipboardList, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { useExcluirAuditoria, type AuditoriaResumo } from '@/api/auditorias'
@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { IconeQuadrado } from '@/components/IconeQuadrado'
 import { CLASSIFICACOES } from '@/lib/classificacao'
 import { formatarData, formatarNota } from '@/lib/formatadores'
 import { cn } from '@/lib/utils'
@@ -23,10 +24,10 @@ function Progresso({ resumo }: { resumo: NonNullable<AuditoriaResumo['resumo']> 
   const respondidas = resumo.respondidas ?? 0
   return (
     <div className="mt-2 flex items-center gap-2">
-      <div className="h-1.5 w-24 overflow-hidden rounded-full bg-muted" aria-hidden>
+      <div className="h-1.5 w-14 shrink-0 overflow-hidden rounded-full bg-muted sm:w-24" aria-hidden>
         <div className="h-full rounded-full bg-primary" style={{ width: `${total ? (respondidas / total) * 100 : 0}%` }} />
       </div>
-      <span className="text-xs text-muted-foreground tabular-nums">
+      <span className="text-xs whitespace-nowrap text-muted-foreground tabular-nums">
         {respondidas}/{total} respondidas
       </span>
     </div>
@@ -90,11 +91,12 @@ export function AuditoriaCard({ auditoria }: { auditoria: AuditoriaResumo }) {
   const classificacao = auditoria.classificacao ? CLASSIFICACOES[auditoria.classificacao] : null
 
   return (
-    <div className="flex items-center gap-1 rounded-xl border bg-card pr-1 text-card-foreground">
+    <div className="flex items-center gap-1 rounded-xl border bg-card pr-1 text-card-foreground transition-colors hover:border-primary/30">
       <Link
         to={destino}
-        className="flex min-h-20 min-w-0 flex-1 items-center gap-3 rounded-xl p-4 transition-colors hover:bg-muted active:bg-muted"
+        className="flex min-h-20 min-w-0 flex-1 items-center gap-3 rounded-xl p-4 transition-colors hover:bg-accent/40 active:bg-accent/60"
       >
+        <IconeQuadrado icone={emAndamento ? ClipboardList : ClipboardCheck} tom={emAndamento ? 'primario' : 'sucesso'} />
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium">{auditoria.clienteNome}</p>
           <p className="truncate text-sm text-muted-foreground">

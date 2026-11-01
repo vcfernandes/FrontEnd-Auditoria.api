@@ -1,6 +1,6 @@
 import { defineConfig, minimal2023Preset } from '@vite-pwa/assets-generator/config'
 
-const FUNDO = '#171717'
+const FUNDO = '#1e3a5f'
 
 // Gera os PNGs de public/ a partir de public/icon.svg: npm run generate-pwa-assets
 export default defineConfig({

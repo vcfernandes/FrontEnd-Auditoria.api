@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 export function BotaoNovo({ para, rotulo }: { para: string; rotulo: string }) {
   return (
     <>
-      <Button asChild size="lg" className="hidden h-11 md:inline-flex">
+      <Button asChild size="lg" className="hidden h-12 md:inline-flex">
         <Link to={para}>
           <Plus aria-hidden />
           {rotulo}

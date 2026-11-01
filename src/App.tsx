@@ -1,10 +1,12 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router'
 import { RotaProtegida, RotaPublica } from '@/auth/RotaProtegida'
 import { AppLayout } from '@/components/layout/AppLayout'
+import { Toaster } from '@/components/ui/sonner'
 import { AuditoriasPage } from '@/pages/auditorias/AuditoriasPage'
 import { NovaAuditoriaPage } from '@/pages/auditorias/NovaAuditoriaPage'
 import { ResponderAuditoriaPage } from '@/pages/auditorias/responder/ResponderAuditoriaPage'
 import { ResultadoAuditoriaPage } from '@/pages/auditorias/resultado/ResultadoAuditoriaPage'
+import { InicioPage } from '@/pages/inicio/InicioPage'
 import { ClienteFormPage } from '@/pages/clientes/ClienteFormPage'
 import { ClientesPage } from '@/pages/clientes/ClientesPage'
 import { ContaPage } from '@/pages/conta/ContaPage'
@@ -24,10 +26,11 @@ const router = createBrowserRouter([
   {
     element: <RotaProtegida />,
     children: [
-      { path: '/', element: <Navigate to="/auditorias" replace /> },
+      { path: '/', element: <Navigate to="/inicio" replace /> },
       {
         element: <AppLayout />,
         children: [
+          { path: '/inicio', element: <InicioPage />, handle: { titulo: 'Início', larga: true } },
           { path: '/auditorias', element: <AuditoriasPage />, handle: { titulo: 'Auditorias' } },
           {
             path: '/auditorias/nova',
@@ -44,7 +47,7 @@ const router = createBrowserRouter([
             element: <ResultadoAuditoriaPage />,
             handle: { titulo: 'Resultado', voltar: '/auditorias' },
           },
-          { path: '/clientes', element: <ClientesPage />, handle: { titulo: 'Clientes' } },
+          { path: '/clientes', element: <ClientesPage />, handle: { titulo: 'Clientes', larga: true } },
           {
             path: '/clientes/novo',
             element: <ClienteFormPage />,
@@ -68,6 +71,7 @@ export default function App() {
     <>
       <RouterProvider router={router} />
       <AvisoAtualizacao />
+      <Toaster position="top-center" richColors closeButton />
     </>
   )
 }

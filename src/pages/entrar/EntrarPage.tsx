@@ -29,7 +29,7 @@ export function EntrarPage() {
   const enviar = handleSubmit((dados) => {
     setErroGeral(null)
     login.mutate(dados, {
-      onSuccess: () => navigate('/', { replace: true }),
+      onSuccess: () => navigate('/inicio', { replace: true }),
       onError: (erro) => setErroGeral(aplicarErroApi(erro, setError, ['email', 'senha'])),
     })
   })
@@ -63,7 +63,7 @@ export function EntrarPage() {
       </form>
       <p className="text-center text-sm text-muted-foreground">
         Ainda não tem conta?{' '}
-        <Link to="/criar-conta" className="font-medium text-foreground underline underline-offset-4">
+        <Link to="/criar-conta" className="font-medium text-primary underline underline-offset-4">
           Criar conta
         </Link>
       </p>

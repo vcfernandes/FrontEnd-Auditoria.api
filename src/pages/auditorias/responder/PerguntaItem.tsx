@@ -53,7 +53,7 @@ export const PerguntaItem = memo(function PerguntaItem({
     <article
       id={`pergunta-${itemId}`}
       className={cn(
-        'flex scroll-mt-52 flex-col gap-3 rounded-xl border bg-card p-4 md:scroll-mt-36',
+        'flex scroll-mt-52 flex-col gap-3 rounded-xl border bg-card p-4 md:scroll-mt-52',
         pendenteObrigatoria && 'border-destructive ring-1 ring-destructive',
       )}
     >

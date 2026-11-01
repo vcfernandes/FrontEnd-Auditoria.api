@@ -1,9 +1,12 @@
-import { ClipboardList } from 'lucide-react'
-import { useSearchParams } from 'react-router'
+import { ClipboardCheck, ClipboardList, Plus, X } from 'lucide-react'
+import { Link, useSearchParams } from 'react-router'
 import { useAuditorias, type StatusAuditoria } from '@/api/auditorias'
 import { ApiError } from '@/api/client'
 import { BotaoNovo } from '@/components/BotaoNovo'
+import { EsqueletoCartoes } from '@/components/Esqueletos'
+import { EstadoVazio } from '@/components/EstadoVazio'
 import { Button } from '@/components/ui/button'
+import { formatarData } from '@/lib/formatadores'
 import { cn } from '@/lib/utils'
 import { AuditoriaCard } from './AuditoriaCard'
 import { FiltroCliente } from './FiltroCliente'
@@ -13,29 +16,22 @@ const ABAS: { status: StatusAuditoria; rotulo: string; vazio: string }[] = [
   { status: 'FINALIZADA', rotulo: 'Finalizadas', vazio: 'Nenhuma auditoria finalizada ainda' },
 ]
 
-function Carregando() {
-  return (
-    <div className="flex flex-col gap-3" aria-busy aria-label="Carregando auditorias">
-      {[0, 1, 2].map((i) => (
-        <div key={i} className="h-20 animate-pulse rounded-xl bg-muted" />
-      ))}
-    </div>
-  )
-}
-
 export function AuditoriasPage() {
   // Aba e cliente ficam na URL: ao voltar de uma auditoria, a lista continua no mesmo filtro.
   const [params, setParams] = useSearchParams()
   const status: StatusAuditoria = params.get('status') === 'finalizadas' ? 'FINALIZADA' : 'EM_ANDAMENTO'
   const clienteId = params.get('cliente')
-  const auditorias = useAuditorias({ status, clienteId: clienteId ?? undefined })
+  // ?desde=aaaa-mm-dd vem dos cartões do painel (finalizadas no mês, nota média de 90 dias).
+  const desde = params.get('desde')
+  const auditorias = useAuditorias({ status, clienteId: clienteId ?? undefined, dataInicio: desde ?? undefined })
 
   const itens = auditorias.data?.pages.flatMap((p) => p.content ?? []) ?? []
   const total = auditorias.data?.pages[0]?.page.totalElements ?? 0
   const aba = ABAS.find((a) => a.status === status)!
 
-  const mudarFiltro = (novo: { status?: StatusAuditoria; clienteId?: string | null }) => {
+  const mudarFiltro = (novo: { status?: StatusAuditoria; clienteId?: string | null; desde?: null }) => {
     const proximo = new URLSearchParams(params)
+    if (novo.desde === null) proximo.delete('desde')
     if (novo.status) {
       if (novo.status === 'FINALIZADA') proximo.set('status', 'finalizadas')
       else proximo.delete('status')
@@ -49,32 +45,52 @@ export function AuditoriasPage() {
 
   return (
     <section className="flex flex-col gap-4 pb-16 md:pb-0">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="sr-only text-2xl font-semibold md:not-sr-only">Auditorias</h1>
+      <h1 className="sr-only">Auditorias</h1>
+
+      {/* Abas + botão "Nova auditoria" (no celular, o botão é o flutuante) */}
+      <div className="flex items-center gap-3">
+        <div role="tablist" aria-label="Situação" className="grid flex-1 grid-cols-2 gap-1 rounded-xl border bg-secondary p-1">
+          {ABAS.map((a) => (
+            <button
+              key={a.status}
+              type="button"
+              role="tab"
+              aria-selected={a.status === status}
+              onClick={() => mudarFiltro({ status: a.status })}
+              className={cn(
+                'h-10 rounded-lg text-sm font-medium transition-colors',
+                a.status === status
+                  ? 'bg-card text-primary shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              {a.rotulo}
+            </button>
+          ))}
+        </div>
         <BotaoNovo para="/auditorias/nova" rotulo="Nova auditoria" />
       </div>
 
-      <div role="tablist" aria-label="Situação" className="grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
-        {ABAS.map((a) => (
-          <button
-            key={a.status}
-            type="button"
-            role="tab"
-            aria-selected={a.status === status}
-            onClick={() => mudarFiltro({ status: a.status })}
-            className={cn(
-              'h-11 rounded-lg text-sm font-medium transition-colors',
-              a.status === status ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground',
-            )}
-          >
-            {a.rotulo}
-          </button>
-        ))}
+      <div className="flex flex-wrap items-center gap-2">
+        <FiltroCliente clienteId={clienteId} onChange={(id) => mudarFiltro({ clienteId: id })} />
+        {desde && (
+          <div className="flex items-center gap-2 rounded-full border border-primary bg-primary-suave/60 py-1 pr-1 pl-3 text-sm">
+            <span>
+              Data da auditoria desde <strong className="font-medium">{formatarData(desde)}</strong>
+            </span>
+            <button
+              type="button"
+              aria-label="Remover filtro de data"
+              onClick={() => mudarFiltro({ desde: null })}
+              className="flex size-9 items-center justify-center rounded-full hover:bg-muted active:bg-muted"
+            >
+              <X className="size-4" aria-hidden />
+            </button>
+          </div>
+        )}
       </div>
 
-      <FiltroCliente clienteId={clienteId} onChange={(id) => mudarFiltro({ clienteId: id })} />
-
-      {auditorias.isPending && <Carregando />}
+      {auditorias.isPending && <EsqueletoCartoes quantidade={3} rotulo="Carregando auditorias" />}
 
       {auditorias.isError && (
         <div role="alert" className="flex flex-col items-start gap-3 rounded-xl border border-destructive/30 p-4">
@@ -88,16 +104,25 @@ export function AuditoriasPage() {
       )}
 
       {auditorias.isSuccess && itens.length === 0 && (
-        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed p-8 text-center">
-          <ClipboardList className="size-10 text-muted-foreground" aria-hidden />
-          <p className="font-medium">
-            {aba.vazio}
-            {clienteId && ' para este cliente'}
-          </p>
-          {status === 'EM_ANDAMENTO' && (
-            <p className="text-sm text-muted-foreground">Toque em “Nova auditoria” para começar uma inspeção.</p>
-          )}
-        </div>
+        <EstadoVazio
+          icone={status === 'EM_ANDAMENTO' ? ClipboardList : ClipboardCheck}
+          titulo={`${aba.vazio}${clienteId ? ' para este cliente' : ''}${desde ? ` desde ${formatarData(desde)}` : ''}`}
+          descricao={
+            status === 'EM_ANDAMENTO'
+              ? 'Comece uma inspeção escolhendo o cliente e o checklist.'
+              : 'As auditorias aparecem aqui depois de finalizadas, com a nota e o relatório em PDF.'
+          }
+          acao={
+            status === 'EM_ANDAMENTO' && (
+              <Button asChild size="lg" className="h-12 w-full text-base">
+                <Link to="/auditorias/nova">
+                  <Plus aria-hidden />
+                  Nova auditoria
+                </Link>
+              </Button>
+            )
+          }
+        />
       )}
 
       {itens.length > 0 && (

@@ -1,63 +1,80 @@
-import { Plus, Search, Users } from 'lucide-react'
+import { Plus, SearchX, Search, Store } from 'lucide-react'
 import { useState } from 'react'
-import { Link } from 'react-router'
-import { useClientes } from '@/api/clientes'
+import { Link, useSearchParams } from 'react-router'
+import { useClientes, type StatusCliente } from '@/api/clientes'
 import { ApiError } from '@/api/client'
+import { BotaoNovo } from '@/components/BotaoNovo'
+import { EsqueletoCartoes } from '@/components/Esqueletos'
+import { EstadoVazio } from '@/components/EstadoVazio'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useDebounce } from '@/lib/useDebounce'
+import { cn } from '@/lib/utils'
 import { ClienteCard } from './ClienteCard'
 
-function Carregando() {
-  return (
-    <div className="flex flex-col gap-3" aria-busy aria-label="Carregando clientes">
-      {[0, 1, 2, 3].map((i) => (
-        <div key={i} className="h-16 animate-pulse rounded-xl bg-muted" />
-      ))}
-    </div>
-  )
-}
-
-function NovoClienteLink({ className }: { className?: string }) {
-  return (
-    <Button asChild size="lg" className={className}>
-      <Link to="/clientes/novo">
-        <Plus aria-hidden />
-        Novo cliente
-      </Link>
-    </Button>
-  )
-}
+const ABAS: { param: string | null; status: StatusCliente; rotulo: string }[] = [
+  { param: null, status: 'ATIVO', rotulo: 'Ativos' },
+  { param: 'inativos', status: 'INATIVO', rotulo: 'Inativos' },
+  { param: 'todos', status: 'TODOS', rotulo: 'Todos' },
+]
 
 export function ClientesPage() {
+  const [params, setParams] = useSearchParams()
+  const aba = ABAS.find((a) => a.param === params.get('status')) ?? ABAS[0]
   const [busca, setBusca] = useState('')
   const nome = useDebounce(busca.trim(), 400)
-  const clientes = useClientes(nome)
+  const clientes = useClientes(nome, aba.status)
 
   const itens = clientes.data?.pages.flatMap((p) => p.content ?? []) ?? []
   const total = clientes.data?.pages[0]?.page.totalElements ?? 0
   const buscando = nome !== ''
 
+  const mudarAba = (novaAba: (typeof ABAS)[number]) => {
+    const proximo = new URLSearchParams(params)
+    if (novaAba.param) proximo.set('status', novaAba.param)
+    else proximo.delete('status')
+    setParams(proximo, { replace: true })
+  }
+
   return (
     <section className="flex flex-col gap-4 pb-16 md:pb-0">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="sr-only text-2xl font-semibold md:not-sr-only">Clientes</h1>
-        <NovoClienteLink className="hidden h-11 md:inline-flex" />
+      <h1 className="sr-only">Clientes</h1>
+
+      {/* Busca + botão "Novo cliente" (no celular, o botão é o flutuante) */}
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden />
+          <Input
+            type="search"
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder="Buscar por nome"
+            aria-label="Buscar cliente por nome"
+            className="h-12 bg-card pl-10 text-base"
+          />
+        </div>
+        <BotaoNovo para="/clientes/novo" rotulo="Novo cliente" />
       </div>
 
-      <div className="relative">
-        <Search className="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden />
-        <Input
-          type="search"
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-          placeholder="Buscar por nome"
-          aria-label="Buscar cliente por nome"
-          className="h-12 pl-10 text-base"
-        />
+      <div role="tablist" aria-label="Situação" className="grid w-full grid-cols-3 gap-1 rounded-xl border bg-secondary p-1 sm:w-80">
+        {ABAS.map((a) => (
+          <button
+            key={a.rotulo}
+            type="button"
+            role="tab"
+            aria-selected={a === aba}
+            onClick={() => mudarAba(a)}
+            className={cn(
+              'h-10 rounded-lg text-sm font-medium transition-colors',
+              a === aba ? 'bg-card text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            {a.rotulo}
+          </button>
+        ))}
       </div>
 
-      {clientes.isPending && <Carregando />}
+      {clientes.isPending && <EsqueletoCartoes quantidade={4} rotulo="Carregando clientes" />}
 
       {clientes.isError && (
         <div role="alert" className="flex flex-col items-start gap-3 rounded-xl border border-destructive/30 p-4">
@@ -70,24 +87,40 @@ export function ClientesPage() {
         </div>
       )}
 
-      {clientes.isSuccess && itens.length === 0 && (
-        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed p-8 text-center">
-          <Users className="size-10 text-muted-foreground" aria-hidden />
-          {buscando ? (
-            <p className="font-medium">Nenhum cliente encontrado para “{nome}”</p>
-          ) : (
-            <>
-              <p className="font-medium">Nenhum cliente ainda</p>
-              <p className="text-sm text-muted-foreground">Cadastre o primeiro cliente para começar suas auditorias.</p>
-              <NovoClienteLink className="h-12 w-full" />
-            </>
-          )}
-        </div>
-      )}
+      {clientes.isSuccess &&
+        itens.length === 0 &&
+        (buscando ? (
+          <EstadoVazio
+            icone={SearchX}
+            titulo={`Nenhum cliente encontrado para “${nome}”`}
+            descricao="Confira a grafia ou busque por outra parte do nome."
+          />
+        ) : aba.status === 'INATIVO' ? (
+          <EstadoVazio icone={Store} titulo="Nenhum cliente inativo" descricao="Os clientes inativados aparecem aqui." />
+        ) : (
+          <EstadoVazio
+            icone={Store}
+            titulo="Nenhum cliente ainda"
+            descricao="Cadastre a padaria, o açougue ou o restaurante que você atende para começar suas auditorias."
+            acao={
+              <Button asChild size="lg" className="h-12 w-full text-base">
+                <Link to="/clientes/novo">
+                  <Plus aria-hidden />
+                  Cadastrar cliente
+                </Link>
+              </Button>
+            }
+          />
+        ))}
 
       {itens.length > 0 && (
         <>
-          <ul className={`flex flex-col gap-3 transition-opacity ${clientes.isPlaceholderData ? 'opacity-60' : ''}`}>
+          <ul
+            className={cn(
+              'grid grid-cols-1 gap-3 transition-opacity md:grid-cols-2 lg:grid-cols-3',
+              clientes.isPlaceholderData && 'opacity-60',
+            )}
+          >
             {itens.map((cliente) => (
               <li key={cliente.id}>
                 <ClienteCard cliente={cliente} />
@@ -95,7 +128,7 @@ export function ClientesPage() {
             ))}
           </ul>
           <p className="text-center text-sm text-muted-foreground">
-            {itens.length} de {total} {total === 1 ? 'cliente' : 'clientes'}
+            Mostrando {itens.length} de {total} {total === 1 ? 'cliente' : 'clientes'}
           </p>
           {clientes.hasNextPage && (
             <Button
@@ -110,15 +143,6 @@ export function ClientesPage() {
           )}
         </>
       )}
-
-      {/* Botão flutuante (celular), acima da barra do rodapé e da área segura do iPhone */}
-      <Link
-        to="/clientes/novo"
-        aria-label="Novo cliente"
-        className="fixed right-4 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-10 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform active:scale-95 md:hidden"
-      >
-        <Plus className="size-7" aria-hidden />
-      </Link>
     </section>
   )
 }

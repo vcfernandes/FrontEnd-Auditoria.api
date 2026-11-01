@@ -1,6 +1,8 @@
-import { Check } from 'lucide-react'
+import { Check, ListChecks } from 'lucide-react'
 import { useChecklists, type ModeloChecklist } from '@/api/checklists'
 import { ApiError } from '@/api/client'
+import { EsqueletoCartoes } from '@/components/Esqueletos'
+import { IconeQuadrado } from '@/components/IconeQuadrado'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -25,10 +27,11 @@ export function ListaModelos({ valor, onChange, modelos }: Props) {
             aria-checked={selecionado}
             onClick={() => onChange(modelo.id!)}
             className={cn(
-              'flex min-h-16 items-start gap-3 rounded-xl border bg-card p-4 text-left transition-colors hover:bg-muted active:bg-muted',
-              selecionado && 'border-primary ring-1 ring-primary',
+              'flex min-h-16 items-start gap-3 rounded-xl border bg-card p-4 text-left transition-colors hover:bg-accent/40 active:bg-accent/60',
+              selecionado && 'border-primary bg-accent/40 ring-1 ring-primary',
             )}
           >
+            <IconeQuadrado icone={ListChecks} />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-medium">{modelo.nome}</span>
@@ -53,13 +56,7 @@ export function ListaModelos({ valor, onChange, modelos }: Props) {
 
 export function EstadoModelos({ consulta }: { consulta: ReturnType<typeof useChecklists> }) {
   if (consulta.isPending) {
-    return (
-      <div className="flex flex-col gap-2" aria-busy>
-        {[0, 1].map((i) => (
-          <div key={i} className="h-16 animate-pulse rounded-xl bg-muted" />
-        ))}
-      </div>
-    )
+    return <EsqueletoCartoes quantidade={2} rotulo="Carregando modelos" />
   }
   if (consulta.isError) {
     return (

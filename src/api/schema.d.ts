@@ -68,6 +68,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/clientes/{id}/reativar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reativar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/checklists": {
         parameters: {
             query?: never;
@@ -174,6 +190,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["finalizar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["montar"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -404,6 +436,23 @@ export interface components {
             /** Format: date */
             data?: string;
             observacoes?: string;
+        };
+        DashboardResponse: {
+            /** Format: int64 */
+            auditoriasEmAndamento?: number;
+            /** Format: int64 */
+            auditoriasFinalizadasNoMes?: number;
+            /** Format: int64 */
+            clientesAtivos?: number;
+            ultimos90Dias?: components["schemas"]["UltimosDias"];
+        };
+        UltimosDias: {
+            notaMedia?: number;
+            /** Format: int64 */
+            finalizadas?: number;
+            porClassificacao?: {
+                [key: string]: number;
+            };
         };
         PageMetadata: {
             /** Format: int64 */
@@ -648,6 +697,7 @@ export interface operations {
         parameters: {
             query?: {
                 nome?: string;
+                status?: "ATIVO" | "INATIVO" | "TODOS";
                 /** @description Zero-based page index (0..N) */
                 page?: number;
                 /** @description The size of the page to be returned */
@@ -687,6 +737,28 @@ export interface operations {
         responses: {
             /** @description Created */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ClienteResponse"];
+                };
+            };
+        };
+    };
+    reativar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -815,6 +887,9 @@ export interface operations {
             query?: {
                 clienteId?: string;
                 status?: "EM_ANDAMENTO" | "FINALIZADA";
+                dataInicio?: string;
+                dataFim?: string;
+                busca?: string;
                 /** @description Zero-based page index (0..N) */
                 page?: number;
                 /** @description The size of the page to be returned */
@@ -903,6 +978,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["AuditoriaResponse"];
+                };
+            };
+        };
+    };
+    montar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DashboardResponse"];
                 };
             };
         };
