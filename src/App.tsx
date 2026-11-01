@@ -31,7 +31,7 @@ const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { path: '/inicio', element: <InicioPage />, handle: { titulo: 'Início', larga: true } },
-          { path: '/auditorias', element: <AuditoriasPage />, handle: { titulo: 'Auditorias' } },
+          { path: '/auditorias', element: <AuditoriasPage />, handle: { titulo: 'Auditorias', larga: true } },
           {
             path: '/auditorias/nova',
             element: <NovaAuditoriaPage />,

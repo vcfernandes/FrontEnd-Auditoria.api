@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { aplicarErroApi } from '@/lib/erros'
 import { formatarData, hojeIso } from '@/lib/formatadores'
+import { comBuscaLembrada } from '@/lib/ultimaLista'
 import { EstadoModelos, ListaModelos } from './SeletorModelo'
 import { SeletorCliente } from './SeletorCliente'
 
@@ -39,7 +40,7 @@ export function NovaAuditoriaPage() {
   const navigate = useNavigate()
   const criar = useCriarAuditoria()
   const modelos = useChecklists()
-  // Vem do menu "⋯" de um cliente na lista (Nova auditoria para este cliente).
+  // `?clienteId=` vem do menu "⋯" de um cliente (Nova auditoria para este cliente).
   const [params] = useSearchParams()
   const clientePreSelecionado = useCliente(params.get('clienteId') ?? undefined)
   const [cliente, setCliente] = useState<Cliente | null>(null)
@@ -61,12 +62,13 @@ export function NovaAuditoriaPage() {
 
   // Modelos inativos não podem ser usados (a API recusaria com 422).
   const lista = (modelos.data ?? []).filter((m) => m.ativo !== false)
-  const unico = lista.length === 1 ? lista[0] : undefined
+  // Vem marcado o modelo de `?modeloId=` (botão "Iniciar auditoria" de um modelo) ou, se só existe um, ele.
+  const modeloDaUrl = params.get('modeloId')
+  const preferido = lista.some((m) => m.id === modeloDaUrl) ? modeloDaUrl : lista.length === 1 ? lista[0].id : undefined
 
-  // Se só existe um modelo (normalmente a RDC 216 da biblioteca), já vem marcado.
   useEffect(() => {
-    if (unico?.id) setValue('modeloId', unico.id)
-  }, [unico?.id, setValue])
+    if (preferido) setValue('modeloId', preferido)
+  }, [preferido, setValue])
 
   const escolherCliente = (novo: Cliente | null) => {
     setCliente(novo)
@@ -175,7 +177,7 @@ export function NovaAuditoriaPage() {
             {criar.isPending ? 'Criando…' : 'Iniciar auditoria'}
           </Button>
           <Button asChild variant="outline" size="lg" className="h-12 text-base">
-            <Link to="/auditorias">Cancelar</Link>
+            <Link to={comBuscaLembrada('/auditorias')}>Cancelar</Link>
           </Button>
         </div>
       </form>

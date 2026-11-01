@@ -3,6 +3,7 @@ import { useAuditoria } from '@/api/auditorias'
 import { ApiError } from '@/api/client'
 import { EsqueletoQuestionario } from '@/components/Esqueletos'
 import { Button } from '@/components/ui/button'
+import { comBuscaLembrada } from '@/lib/ultimaLista'
 import { Questionario } from './Questionario'
 
 export function ResponderAuditoriaPage() {
@@ -25,7 +26,7 @@ export function ResponderAuditoriaPage() {
               : 'Não foi possível carregar a auditoria.'}
         </p>
         <Button asChild variant="outline" size="lg" className="h-11">
-          <Link to="/auditorias">Voltar para auditorias</Link>
+          <Link to={comBuscaLembrada('/auditorias')}>Voltar para auditorias</Link>
         </Button>
       </div>
     )

@@ -1,4 +1,4 @@
-import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { toast } from 'sonner'
 import { FilaRespostas, type RespostaEnvio } from '@/lib/filaRespostas'
@@ -22,32 +22,38 @@ export function useAuditoria(id: string | undefined) {
 export type AuditoriaResumo = Schemas['AuditoriaResumoResponse']
 export type StatusAuditoria = NonNullable<Auditoria['status']>
 
-const TAMANHO_PAGINA = 20
+export const TAMANHO_PAGINA_AUDITORIAS = 20
 
 export interface FiltroAuditorias {
-  status: StatusAuditoria
+  /** Sem status = todas. */
+  status?: StatusAuditoria
   clienteId?: string
-  /** aaaa-mm-dd: auditorias com `dataAuditoria` a partir deste dia. */
+  /** Nome do cliente ou do modelo. */
+  busca?: string
+  /** aaaa-mm-dd, pela `dataAuditoria` (inclusive). */
   dataInicio?: string
+  dataFim?: string
+  /** Começa em 0. */
+  pagina: number
 }
 
-/** Lista paginada; a API já ordena por data (mais recentes primeiro). */
+/** Uma página da lista; a API já ordena por data (mais recentes primeiro). */
 export function useAuditorias(filtro: FiltroAuditorias) {
-  return useInfiniteQuery({
-    queryKey: ['auditorias', 'lista', filtro.status, filtro.clienteId ?? null, filtro.dataInicio ?? null],
-    initialPageParam: 0,
-    queryFn: ({ pageParam, signal }) =>
+  return useQuery({
+    queryKey: ['auditorias', 'lista', filtro],
+    queryFn: ({ signal }) =>
       api.get<Schemas['PagedModelAuditoriaResumoResponse']>('/auditorias', {
         params: {
           status: filtro.status,
           clienteId: filtro.clienteId,
+          busca: filtro.busca,
           dataInicio: filtro.dataInicio,
-          page: pageParam,
-          size: TAMANHO_PAGINA,
+          dataFim: filtro.dataFim,
+          page: filtro.pagina,
+          size: TAMANHO_PAGINA_AUDITORIAS,
         },
         signal,
       }),
-    getNextPageParam: ({ page }) => (page.number + 1 < page.totalPages ? page.number + 1 : undefined),
     placeholderData: keepPreviousData,
   })
 }

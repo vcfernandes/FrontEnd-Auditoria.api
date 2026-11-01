@@ -36,7 +36,7 @@ export function ContinuarDeOndeParou({ mostrarAcao = true }: { mostrarAcao?: boo
     <PainelSecao
       titulo="Continuar de onde parou"
       subtitulo={total > QUANTIDADE ? `${QUANTIDADE} de ${total} em andamento` : undefined}
-      verTodas={itens.length > 0 ? '/auditorias' : undefined}
+      verTodas={itens.length > 0 ? '/auditorias?status=andamento' : undefined}
     >
       {consulta.isPending && <EsqueletoLinhas quantidade={3} />}
       {consulta.isError && <ErroSecao erro={consulta.error} onTentar={() => consulta.refetch()} />}

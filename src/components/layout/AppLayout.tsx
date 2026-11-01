@@ -1,5 +1,6 @@
 import { ArrowLeft, ClipboardCheck } from 'lucide-react'
 import { Link, NavLink, Outlet, useMatches } from 'react-router'
+import { comBuscaLembrada } from '@/lib/ultimaLista'
 import { cn } from '@/lib/utils'
 import { AvisoOffline } from '@/pwa/AvisoOffline'
 import { itensNavegacao } from './itensNavegacao'
@@ -17,7 +18,7 @@ export interface RotaHandle {
 function BotaoVoltar({ para }: { para: string }) {
   return (
     <Link
-      to={para}
+      to={comBuscaLembrada(para)}
       aria-label="Voltar"
       className="flex size-11 items-center justify-center rounded-lg hover:bg-muted active:bg-muted"
     >

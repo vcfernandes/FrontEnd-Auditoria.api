@@ -5,6 +5,7 @@ import { ApiError } from '@/api/client'
 import { EsqueletoResultado } from '@/components/Esqueletos'
 import { IconeQuadrado, type TomIcone } from '@/components/IconeQuadrado'
 import { Button } from '@/components/ui/button'
+import { comBuscaLembrada } from '@/lib/ultimaLista'
 import { Card, CardContent } from '@/components/ui/card'
 import { CLASSIFICACOES } from '@/lib/classificacao'
 import { formatarData, formatarNota } from '@/lib/formatadores'
@@ -53,7 +54,7 @@ export function ResultadoAuditoriaPage() {
               : 'Não foi possível carregar a auditoria.'}
         </p>
         <Button asChild variant="outline" size="lg" className="h-11">
-          <Link to="/auditorias">Voltar para auditorias</Link>
+          <Link to={comBuscaLembrada('/auditorias')}>Voltar para auditorias</Link>
         </Button>
       </div>
     )

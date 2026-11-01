@@ -54,11 +54,11 @@ export function CartoesResumo({ dados }: { dados: Dashboard }) {
 
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-      <Cartao para="/auditorias" icone={ClipboardList} tom="alerta" rotulo="Em andamento">
+      <Cartao para="/auditorias?status=andamento" icone={ClipboardList} tom="alerta" rotulo="Em andamento">
         <p className={numero}>{dados.auditoriasEmAndamento ?? 0}</p>
       </Cartao>
       <Cartao
-        para={`/auditorias?status=finalizadas&desde=${inicioDoMesIso()}`}
+        para={`/auditorias?status=finalizadas&de=${inicioDoMesIso()}`}
         icone={ClipboardCheck}
         tom="sucesso"
         rotulo="Finalizadas no mês"
@@ -69,7 +69,7 @@ export function CartoesResumo({ dados }: { dados: Dashboard }) {
         <p className={numero}>{dados.clientesAtivos ?? 0}</p>
       </Cartao>
       <Cartao
-        para={`/auditorias?status=finalizadas&desde=${inicioDoPeriodoIso(90)}`}
+        para={`/auditorias?status=finalizadas&de=${inicioDoPeriodoIso(90)}`}
         icone={Gauge}
         tom={classificacao ? TOM_DA_CLASSIFICACAO[classificacao] : 'neutro'}
         rotulo="Nota média (90 dias)"

@@ -42,7 +42,7 @@ export function FiltroCliente({ clienteId, onChange }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-2 rounded-xl border p-3">
+    <div className="flex w-full flex-col gap-2 rounded-xl border bg-card p-3 sm:max-w-md">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium">Filtrar por cliente</span>
         <Button type="button" variant="ghost" size="lg" className="h-9" onClick={() => setAberto(false)}>
