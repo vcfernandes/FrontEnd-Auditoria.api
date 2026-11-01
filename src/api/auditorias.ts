@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { FilaRespostas, type RespostaEnvio } from '@/lib/filaRespostas'
 import { api, type Schemas } from './client'
@@ -15,6 +15,37 @@ export function useAuditoria(id: string | undefined) {
     queryKey: chaveDetalhe(id),
     queryFn: ({ signal }) => api.get<Auditoria>(`/auditorias/${id}`, { signal }),
     enabled: !!id,
+  })
+}
+
+export type AuditoriaResumo = Schemas['AuditoriaResumoResponse']
+export type StatusAuditoria = NonNullable<Auditoria['status']>
+
+const TAMANHO_PAGINA = 20
+
+/** Lista paginada; a API já ordena por data (mais recentes primeiro). */
+export function useAuditorias(filtro: { status: StatusAuditoria; clienteId?: string }) {
+  return useInfiniteQuery({
+    queryKey: ['auditorias', 'lista', filtro.status, filtro.clienteId ?? null],
+    initialPageParam: 0,
+    queryFn: ({ pageParam, signal }) =>
+      api.get<Schemas['PagedModelAuditoriaResumoResponse']>('/auditorias', {
+        params: { status: filtro.status, clienteId: filtro.clienteId, page: pageParam, size: TAMANHO_PAGINA },
+        signal,
+      }),
+    getNextPageParam: ({ page }) => (page.number + 1 < page.totalPages ? page.number + 1 : undefined),
+    placeholderData: keepPreviousData,
+  })
+}
+
+export function useExcluirAuditoria() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/auditorias/${id}`),
+    onSuccess: (_, id) => {
+      queryClient.removeQueries({ queryKey: chaveDetalhe(id) })
+      return queryClient.invalidateQueries({ queryKey: ['auditorias', 'lista'] })
+    },
   })
 }
 

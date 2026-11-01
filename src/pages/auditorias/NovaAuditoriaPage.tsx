@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { aplicarErroApi } from '@/lib/erros'
-import { hojeIso } from '@/lib/formatadores'
+import { formatarData, hojeIso } from '@/lib/formatadores'
 import { EstadoModelos, ListaModelos } from './SeletorModelo'
 import { SeletorCliente } from './SeletorCliente'
 
@@ -51,7 +51,8 @@ export function NovaAuditoriaPage() {
     resolver: zodResolver(esquema),
     defaultValues: { clienteId: '', modeloId: '', data: hojeIso(), observacoes: '' },
   })
-  const [clienteId, modeloId] = useWatch({ control, name: ['clienteId', 'modeloId'] })
+  const [clienteId, modeloId, data] = useWatch({ control, name: ['clienteId', 'modeloId', 'data'] })
+  const hoje = hojeIso()
 
   // Modelos inativos não podem ser usados (a API recusaria com 422).
   const lista = (modelos.data ?? []).filter((m) => m.ativo !== false)
@@ -88,7 +89,7 @@ export function NovaAuditoriaPage() {
     <div className="flex flex-col gap-6">
       <h1 className="sr-only text-2xl font-semibold md:not-sr-only">Nova auditoria</h1>
 
-      <form onSubmit={enviar} noValidate className="flex flex-col gap-8">
+      <form onSubmit={enviar} noValidate autoComplete="off" className="flex flex-col gap-8">
         <Secao titulo="Cliente" erro={errors.clienteId?.message}>
           <SeletorCliente valor={cliente} onChange={escolherCliente} />
         </Secao>
@@ -110,7 +111,27 @@ export function NovaAuditoriaPage() {
         </Secao>
 
         <Secao titulo="Detalhes">
-          <CampoTexto rotulo="Data da auditoria" type="date" erro={errors.data?.message} {...register('data')} />
+          <div className="flex flex-col gap-1.5">
+            <CampoTexto
+              rotulo="Data da auditoria"
+              type="date"
+              autoComplete="off"
+              erro={errors.data?.message}
+              {...register('data')}
+            />
+            {data !== hoje && (
+              <p className="text-sm text-muted-foreground">
+                {data ? 'Não é a data de hoje. ' : ''}
+                <button
+                  type="button"
+                  className="min-h-10 font-medium text-foreground underline underline-offset-4"
+                  onClick={() => setValue('data', hoje, { shouldValidate: true })}
+                >
+                  Usar hoje ({formatarData(hoje)})
+                </button>
+              </p>
+            )}
+          </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="observacoes" className="text-sm">
               Observações (opcional)

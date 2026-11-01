@@ -110,10 +110,12 @@ Navegação no celular: barra inferior (Auditorias, Clientes, Conta). No computa
   - Sair com algo não salvo: `useBlocker` tenta salvar e só sai quando terminar (ou se o usuário escolher sair sem salvar após erro); `beforeunload` avisa ao fechar/recarregar.
   - Desempenho: perguntas com `memo` e callbacks estáveis; seções fechadas não renderizam perguntas.
   - Respostas não salvas ficam só na memória: recarregar à força ou 401 durante uma falha perde o que não foi enviado (modo offline está no backlog).
+- [x] Histórico (antecipado): lista em `/auditorias` abaixo de "Nova auditoria", abas Em andamento (padrão) / Finalizadas e filtro opcional por cliente, guardados na URL (`?status=finalizadas&cliente=<id>`). Cartão: cliente, modelo, data; em andamento mostra progresso e abre `/responder` (com Excluir + confirmação); finalizada mostra nota e classificação e abre `/resultado`. "Carregar mais", estados vazio/carregamento. A ordem (mais recentes primeiro) vem da API.
+  - `GET /auditorias` não traz o `resumo`: cada cartão em andamento busca `GET /auditorias/{id}` para o progresso (também deixa a tela de responder pronta no cache). Melhor seria o backend incluir `resumo` em `AuditoriaResumoResponse`.
+  - Data padrão da Nova auditoria: `hojeIso()` estava correto; o banco mostrou datas 15/10 e 16/10 enviadas pelo front em auditorias criadas em 31/10, provavelmente preenchimento automático do navegador. Campo e formulário agora com `autoComplete="off"` e aviso "Não é a data de hoje · Usar hoje".
 
 ### Protótipo (fazer agora, nesta ordem)
 - [ ] Resultado + PDF
-- [ ] Histórico
 - [ ] PWA: manifesto, ícones, instalação
 
 ### Depois do protótipo (backlog)
