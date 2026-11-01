@@ -102,9 +102,10 @@ Navegação no celular: barra inferior (Auditorias, Clientes, Conta). No computa
   - Pendência do backend: a API não devolve o nome da organização em `/auth/me` nem no login, então a Conta não mostra a organização.
 - [x] Clientes: lista com busca (debounce de 400 ms) e "Carregar mais" (`useInfiniteQuery`), cartão com nome/categoria/CNPJ formatado, estados vazio e de carregamento; formulário único para criar/editar em `/clientes/novo` e `/clientes/:id` (CNPJ com máscara, categoria com sugestões em botões + texto livre, `tipo` sempre `SIMPLES`); 409 vai para o campo CNPJ; Inativar com confirmação e volta para a lista. Hooks em `src/api/clientes.ts` (mutações invalidam `['clientes']`). O cabeçalho do celular mostra seta de voltar quando a rota tem `handle.voltar`.
   - Não verificado contra a API: se limpar o CNPJ/categoria na edição (campo omitido no PUT) realmente apaga o valor no backend.
+- [x] Nova auditoria: botão "Nova auditoria" em `/auditorias` (`BotaoNovo`: flutuante no celular, no topo no computador; a lista fica para o Histórico). `/auditorias/nova`: cliente (busca + escolha; sem clientes, atalho para cadastrar), modelo (`GET /checklists`, só ativos, etiqueta "Biblioteca", pré-seleciona se houver um único), data (hoje) e observações; `POST /auditorias` e vai para `/auditorias/{id}/responder` (página provisória com cliente, modelo e resumo). Hooks em `src/api/auditorias.ts` e `src/api/checklists.ts`.
+  - `GET /checklists` não informa a quantidade de perguntas, então ela não aparece na lista de modelos.
 
 ### Protótipo (fazer agora, nesta ordem)
-- [ ] Nova auditoria
 - [ ] Responder auditoria
 - [ ] Resultado + PDF
 - [ ] Histórico
