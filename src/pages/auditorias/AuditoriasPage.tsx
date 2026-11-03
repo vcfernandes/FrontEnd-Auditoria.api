@@ -71,7 +71,6 @@ export function AuditoriasPage() {
           key={aba}
           biblioteca={aba === 'biblioteca'}
           onIrParaBiblioteca={() => mudarAba('biblioteca')}
-          onIrParaMeusModelos={() => mudarAba('modelos')}
         />
       )}
     </section>

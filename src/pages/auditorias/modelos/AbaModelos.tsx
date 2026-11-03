@@ -1,4 +1,5 @@
-import { Library, ListChecks } from 'lucide-react'
+import { Library, ListChecks, Plus } from 'lucide-react'
+import { Link } from 'react-router'
 import { useChecklists } from '@/api/checklists'
 import { ApiError } from '@/api/client'
 import { EsqueletoCartoes } from '@/components/Esqueletos'
@@ -10,10 +11,20 @@ interface Props {
   /** true = Biblioteca (modelos padrão); false = Meus modelos (da organização). */
   biblioteca: boolean
   onIrParaBiblioteca: () => void
-  onIrParaMeusModelos: () => void
 }
 
-export function AbaModelos({ biblioteca, onIrParaBiblioteca, onIrParaMeusModelos }: Props) {
+function BotaoNovoModelo({ className, variant }: { className?: string; variant?: 'outline' }) {
+  return (
+    <Button asChild size="lg" variant={variant} className={className}>
+      <Link to="/auditorias/modelos/novo">
+        <Plus aria-hidden />
+        Novo modelo
+      </Link>
+    </Button>
+  )
+}
+
+export function AbaModelos({ biblioteca, onIrParaBiblioteca }: Props) {
   const consulta = useChecklists()
   // Inativados não aparecem (não podem ser usados em novas auditorias).
   const modelos = (consulta.data ?? []).filter((m) => !!m.biblioteca === biblioteca && m.ativo !== false)
@@ -40,12 +51,15 @@ export function AbaModelos({ biblioteca, onIrParaBiblioteca, onIrParaMeusModelos
       <EstadoVazio
         icone={ListChecks}
         titulo="Você ainda não tem modelos próprios"
-        descricao="Duplique um modelo da Biblioteca (como a RDC 216/2004) para ter uma cópia da sua organização."
+        descricao="Crie um do zero ou parta de um modelo da Biblioteca, como a RDC 216/2004."
         acao={
-          <Button size="lg" className="h-12 w-full text-base" onClick={onIrParaBiblioteca}>
-            <Library aria-hidden />
-            Ver a Biblioteca
-          </Button>
+          <div className="flex flex-col gap-2">
+            <BotaoNovoModelo className="h-12 w-full text-base" />
+            <Button variant="outline" size="lg" className="h-12 w-full text-base" onClick={onIrParaBiblioteca}>
+              <Library aria-hidden />
+              Ver a Biblioteca
+            </Button>
+          </div>
         }
       />
     )
@@ -53,15 +67,20 @@ export function AbaModelos({ biblioteca, onIrParaBiblioteca, onIrParaMeusModelos
 
   return (
     <div className="flex flex-col gap-3">
-      {biblioteca && (
+      {biblioteca ? (
         <p className="text-sm text-muted-foreground">
-          Modelos padrão, prontos para usar. Duplique para ter uma cópia em Meus modelos.
+          Modelos padrão, prontos para usar. Para personalizar, duplique e edite a sua cópia.
         </p>
+      ) : (
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <p className="text-sm text-muted-foreground">Modelos da sua organização, que você pode editar.</p>
+          <BotaoNovoModelo variant="outline" className="h-11 w-full md:w-auto" />
+        </div>
       )}
       <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
         {modelos.map((modelo) => (
           <li key={modelo.id}>
-            <ModeloCard modelo={modelo} onDuplicado={biblioteca ? onIrParaMeusModelos : undefined} />
+            <ModeloCard modelo={modelo} />
           </li>
         ))}
       </ul>

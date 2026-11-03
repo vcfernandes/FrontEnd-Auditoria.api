@@ -3,6 +3,7 @@ import { RotaProtegida, RotaPublica } from '@/auth/RotaProtegida'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { Toaster } from '@/components/ui/sonner'
 import { AuditoriasPage } from '@/pages/auditorias/AuditoriasPage'
+import { EditorModeloPage } from '@/pages/auditorias/modelos/editor/EditorModeloPage'
 import { NovaAuditoriaPage } from '@/pages/auditorias/NovaAuditoriaPage'
 import { ResponderAuditoriaPage } from '@/pages/auditorias/responder/ResponderAuditoriaPage'
 import { ResultadoAuditoriaPage } from '@/pages/auditorias/resultado/ResultadoAuditoriaPage'
@@ -36,6 +37,16 @@ const router = createBrowserRouter([
             path: '/auditorias/nova',
             element: <NovaAuditoriaPage />,
             handle: { titulo: 'Nova auditoria', voltar: '/auditorias' },
+          },
+          {
+            path: '/auditorias/modelos/novo',
+            element: <EditorModeloPage />,
+            handle: { titulo: 'Novo modelo', voltar: '/auditorias', larga: true },
+          },
+          {
+            path: '/auditorias/modelos/:id/editar',
+            element: <EditorModeloPage />,
+            handle: { titulo: 'Editar modelo', voltar: '/auditorias', larga: true },
           },
           {
             path: '/auditorias/:id/responder',

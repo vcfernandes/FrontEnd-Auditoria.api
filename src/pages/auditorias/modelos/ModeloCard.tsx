@@ -1,6 +1,6 @@
-import { ClipboardPlus, Copy, Eye, ListChecks, MoreHorizontal, PowerOff } from 'lucide-react'
+import { ClipboardPlus, Copy, Eye, ListChecks, MoreHorizontal, Pencil, PowerOff } from 'lucide-react'
 import { useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { useDuplicarChecklist, useInativarChecklist, type ModeloChecklist } from '@/api/checklists'
 import { ApiError } from '@/api/client'
 import { IconeQuadrado } from '@/components/IconeQuadrado'
@@ -26,11 +26,10 @@ import { PerguntasModelo } from './PerguntasModelo'
 
 interface Props {
   modelo: ModeloChecklist
-  /** Chamado depois de duplicar (a Biblioteca leva para Meus modelos). */
-  onDuplicado?: () => void
 }
 
-export function ModeloCard({ modelo, onDuplicado }: Props) {
+export function ModeloCard({ modelo }: Props) {
+  const navigate = useNavigate()
   const duplicar = useDuplicarChecklist()
   const inativar = useInativarChecklist()
   const [vendo, setVendo] = useState(false)
@@ -66,10 +65,17 @@ export function ModeloCard({ modelo, onDuplicado }: Props) {
             <DropdownMenuItem
               className="h-10 cursor-pointer"
               disabled={duplicar.isPending}
-              onSelect={() => duplicar.mutate(modelo.id!, { onSuccess: () => onDuplicado?.() })}
+              onSelect={() =>
+                duplicar.mutate(modelo.id!, {
+                  // Da Biblioteca, o motivo de duplicar é personalizar: já abre a cópia no editor.
+                  onSuccess: (copia) => {
+                    if (modelo.biblioteca) navigate(`/auditorias/modelos/${copia.id}/editar`)
+                  },
+                })
+              }
             >
               <Copy aria-hidden />
-              {duplicar.isPending ? 'Duplicando…' : 'Duplicar'}
+              {duplicar.isPending ? 'Duplicando…' : modelo.biblioteca ? 'Duplicar e editar' : 'Duplicar'}
             </DropdownMenuItem>
             <DropdownMenuItem asChild className="h-10 cursor-pointer">
               <Link to={`/auditorias/nova?modeloId=${modelo.id}`}>
@@ -97,10 +103,19 @@ export function ModeloCard({ modelo, onDuplicado }: Props) {
       {modelo.descricao && <p className="line-clamp-3 text-sm text-muted-foreground">{modelo.descricao}</p>}
 
       <div className="mt-auto grid grid-cols-2 gap-2 pt-1">
-        <Button variant="outline" size="lg" className="h-11" onClick={() => setVendo(true)}>
-          <Eye aria-hidden />
-          Ver perguntas
-        </Button>
+        {modelo.biblioteca ? (
+          <Button variant="outline" size="lg" className="h-11" onClick={() => setVendo(true)}>
+            <Eye aria-hidden />
+            Ver perguntas
+          </Button>
+        ) : (
+          <Button asChild variant="outline" size="lg" className="h-11">
+            <Link to={`/auditorias/modelos/${modelo.id}/editar`}>
+              <Pencil aria-hidden />
+              Editar
+            </Link>
+          </Button>
+        )}
         <Button asChild size="lg" className="h-11">
           <Link to={`/auditorias/nova?modeloId=${modelo.id}`}>
             <ClipboardPlus aria-hidden />

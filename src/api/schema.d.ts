@@ -291,6 +291,8 @@ export interface components {
             secoes: components["schemas"]["SecaoRequest"][];
         };
         PerguntaRequest: {
+            /** Format: uuid */
+            id?: string;
             texto: string;
             /** Format: int32 */
             peso?: number;
@@ -298,6 +300,8 @@ export interface components {
             referenciaLegal?: string;
         };
         SecaoRequest: {
+            /** Format: uuid */
+            id?: string;
             titulo: string;
             perguntas: components["schemas"]["PerguntaRequest"][];
         };

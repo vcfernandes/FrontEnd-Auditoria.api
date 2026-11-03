@@ -1,6 +1,11 @@
 import type { FieldValues, Path, UseFormSetError } from 'react-hook-form'
 import { ApiError } from '@/api/client'
 
+/** Campo de lista da API para o caminho do formulário: `secoes[0].perguntas[2].peso` → `secoes.0.perguntas.2.peso`. */
+export function caminhoDoCampoApi(campo: string) {
+  return campo.replace(/\[(\d+)\]/g, '.$1')
+}
+
 /**
  * Coloca os erros de validação (400) nos campos do formulário.
  * Devolve a mensagem geral a mostrar quando o erro não pertence a um campo.
