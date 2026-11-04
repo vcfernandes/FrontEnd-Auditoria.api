@@ -16,7 +16,7 @@ O backend é outro repositório (`auditoria-api`, Java 21 + Spring Boot 4) e já
 - Trabalhe **uma etapa por vez** (uma tela ou uma peça de infraestrutura). Ao terminar, rode `npm run build` e `npm run lint`, explique brevemente as decisões principais e me diga como testar no navegador.
 - Antes de criar ou alterar arquivos, diga quais serão.
 - Não implemente itens do backlog sem eu pedir.
-- Ao concluir uma etapa, atualize a seção **Status** deste arquivo.
+- Ao terminar cada etapa, atualize a seção **Status** deste arquivo **e o `CHANGELOG.md`** (etapa nova no topo, em linguagem simples, sem jargão técnico). Se a etapa mudar o que o consultor vê ou faz, confira também o `docs/MANUAL.md`.
 - Se subir o servidor de desenvolvimento para testar, encerre ao terminar.
 
 ## Stack
@@ -170,6 +170,7 @@ Navegação no celular: barra inferior (Início, Auditorias, Clientes, Conta). N
     - Limites: a comparação com `atualizadoEm` usa o relógio do aparelho contra o do servidor; os rascunhos ficam por usuário e **não são apagados no logout** nem quando o modelo é inativado; `localStorage` cheio ou bloqueado desliga o rascunho sem aviso. Sem internet o editor funciona, mas salvar exige conexão (o modo offline continua no backlog).
   - Testado no Chrome contra a API real, incluindo: ids no corpo do PUT, arrastar com rolagem, auditoria em andamento sem mudança após editar o modelo.
 - [x] Preparação para publicação atrás do Caddy (ver "Publicação"): `.env.production` com `VITE_API_URL=/api`; `montarUrl` passou de `new URL(..., origin)` para concatenação simples. O resto já estava conforme.
+- [x] Documentação para pessoas: `README.md` (o que é, stack, como rodar, comandos, links), `docs/MANUAL.md` (guia do consultor, passo a passo) e `CHANGELOG.md` (por etapa, linguagem simples). O `CLAUDE.md` continua sendo o contexto técnico para o assistente. O manual foi escrito a partir dos textos reais da interface; se um botão ou menu mudar de nome, atualize o manual.
 
 ### Protótipo (fazer agora, nesta ordem)
 
