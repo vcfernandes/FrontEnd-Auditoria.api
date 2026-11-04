@@ -16,7 +16,11 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 
-export function BotaoReabrir({ auditoriaId }: { auditoriaId: string }) {
+/** Frase de aviso para o diálogo de reabrir; vazia quando não há assinaturas a perder. */
+export const AVISO_ASSINATURAS_APAGADAS =
+  'As assinaturas já feitas serão apagadas, e será preciso finalizar e assinar de novo.'
+
+export function BotaoReabrir({ auditoriaId, temAssinaturas = false }: { auditoriaId: string; temAssinaturas?: boolean }) {
   const navigate = useNavigate()
   const reabrir = useReabrirAuditoria(auditoriaId)
   const [erro, setErro] = useState<string | null>(null)
@@ -35,6 +39,11 @@ export function BotaoReabrir({ auditoriaId }: { auditoriaId: string }) {
           <AlertDialogDescription>
             A nota será descartada até você finalizar de novo. As respostas continuam salvas.
           </AlertDialogDescription>
+          {temAssinaturas && (
+            <p role="alert" className="rounded-lg bg-destructive/10 p-3 text-sm font-medium text-destructive">
+              {AVISO_ASSINATURAS_APAGADAS}
+            </p>
+          )}
         </AlertDialogHeader>
         {erro && (
           <p role="alert" className="text-sm text-destructive">

@@ -10,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { CLASSIFICACOES } from '@/lib/classificacao'
 import { formatarData, formatarNota } from '@/lib/formatadores'
 import { cn } from '@/lib/utils'
+import { Assinaturas } from './Assinaturas'
 import { BotaoReabrir } from './BotaoReabrir'
 import { BotaoRelatorio } from './BotaoRelatorio'
 import { NaoConformidades } from './NaoConformidades'
@@ -98,9 +99,11 @@ export function ResultadoAuditoriaPage() {
         </CardContent>
       </Card>
 
+      <Assinaturas auditoria={dados} />
+
       <div className="flex flex-col gap-3">
         <BotaoRelatorio auditoriaId={id!} />
-        <BotaoReabrir auditoriaId={id!} />
+        <BotaoReabrir auditoriaId={id!} temAssinaturas={(dados.assinaturas?.length ?? 0) > 0} />
       </div>
 
       <NaoConformidades auditoria={dados} />

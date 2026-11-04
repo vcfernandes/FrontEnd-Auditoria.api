@@ -16,7 +16,7 @@ Você vai usar principalmente o **celular**, dentro do estabelecimento. No **com
 4. [Ter um modelo de checklist](#4-ter-um-modelo-de-checklist)
 5. [Fazer uma auditoria](#5-fazer-uma-auditoria)
 6. [Finalizar a auditoria](#6-finalizar-a-auditoria)
-7. [Gerar e compartilhar o PDF](#7-gerar-e-compartilhar-o-pdf)
+7. [Assinar e gerar o relatório em PDF](#7-assinar-gerar-e-compartilhar-o-relatório-em-pdf)
 8. [Consultar o histórico](#8-consultar-o-histórico)
 9. [Dúvidas e problemas comuns](#9-dúvidas-e-problemas-comuns)
 
@@ -221,9 +221,10 @@ Depois de finalizada, você vê o **resultado**.
   - **Regular** (amarelo): de 60 a menos de 75
   - **Inadequado** (vermelho): abaixo de 60
 - **Resumo**: quantas respostas foram conformes, não conformes e não se aplica.
-- **Não conformidades**, por seção, com a pergunta, a sua observação e a referência legal.
+- **Assinaturas**, logo abaixo (veja a seção 7).
+- **Não conformidades**, por seção, com a pergunta, a sua observação, a referência legal e as fotos.
 
-**Esqueceu de corrigir algo?** Toque em **Reabrir auditoria**. A nota é descartada até você finalizar de novo, e as respostas continuam salvas.
+**Esqueceu de corrigir algo?** Toque em **Reabrir auditoria**. A nota é descartada até você finalizar de novo, e as respostas continuam salvas. **Atenção:** se a auditoria já tiver assinaturas, elas são **apagadas** ao reabrir (o app avisa antes de confirmar), porque o conteúdo pode mudar. Depois de finalizar de novo, é preciso assinar outra vez.
 
 ---
 
@@ -236,7 +237,7 @@ O relatório em PDF só existe para auditorias **finalizadas** (em andamento, n�
 | | **Relatório para o cliente** | **Relatório completo** |
 |---|---|---|
 | Para quê | Entregar ao dono do estabelecimento | Seu arquivo e a fiscalização |
-| O que traz | Dados básicos, nota e classificação em destaque, não conformidades (com observações, referência legal e **fotos**), observações gerais e assinaturas | Tudo do relatório para o cliente **e mais** o checklist inteiro, pergunta por pergunta, com a resposta, a observação e as fotos de qualquer resposta |
+| O que traz | Dados básicos, nota e classificação em destaque, não conformidades (com observações, referência legal e **fotos**), observações gerais e as **assinaturas** | Tudo do relatório para o cliente **e mais** o checklist inteiro, pergunta por pergunta, com a resposta, a observação e as fotos de qualquer resposta |
 | Tamanho | Curto | Maior |
 
 Na dúvida, envie ao cliente o **Relatório para o cliente** (é o botão em destaque) e guarde o **completo** no seu arquivo.
@@ -281,6 +282,12 @@ O acesso vale por 8 horas. Entre de novo. Respostas já salvas não se perdem.
 
 **Não consigo finalizar.**
 Falta responder alguma pergunta **obrigatória**. O app leva você até ela.
+
+**Não consigo assinar, ou o botão Assinar pede o nome.**
+O nome de quem assina é obrigatório. E só dá para assinar com a auditoria **finalizada**.
+
+**Sumiram as assinaturas.**
+Ao **reabrir** a auditoria elas são apagadas de propósito. Finalize de novo e assine outra vez.
 
 **Pedi o relatório e nada aconteceu no celular.**
 Espere o "Gerando…" terminar (pode levar alguns segundos) e use os botões **Compartilhar** ou **Abrir PDF** que aparecem logo abaixo.

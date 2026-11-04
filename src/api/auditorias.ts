@@ -161,7 +161,8 @@ export function useReabrirAuditoria(id: string) {
     mutationFn: () => api.post<Auditoria>(`/auditorias/${id}/reabrir`),
     onSuccess: (auditoria) => {
       toast.success('Auditoria reaberta.')
-      queryClient.setQueryData(chaveDetalhe(id), auditoria)
+      queryClient.setQueryData(chaveDetalhe(id), { ...auditoria, assinaturas: [] }) // o backend apaga as assinaturas ao reabrir
+      queryClient.removeQueries({ queryKey: ['assinaturas', id] })
       return queryClient.invalidateQueries({ queryKey: ['auditorias', 'lista'] })
     },
   })

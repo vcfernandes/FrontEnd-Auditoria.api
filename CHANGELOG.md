@@ -4,6 +4,16 @@ O que foi feito no Auditorias, etapa por etapa, em linguagem simples. As etapas 
 
 O projeto está em fase de **protótipo**: o objetivo é o consultor usar no dia a dia e dar retorno.
 
+## Etapa 17 — Assinatura na tela (4 nov 2026)
+
+- No **resultado** da auditoria finalizada há uma seção **Assinaturas**, antes dos botões de relatório, com dois cartões: **Auditor** (o seu nome já vem preenchido, mas pode ser trocado) e **Responsável pelo estabelecimento** (nome e cargo).
+- Toque em **Assinar** para abrir o **quadro de assinatura em tela cheia**, pensado para assinar com o dedo no celular, de preferência deitado. A página não rola enquanto você assina. Há **Limpar**, **Cancelar** e **Confirmar**.
+- O app **recorta o espaço vazio** em volta da assinatura e salva com fundo transparente.
+- A assinatura salva aparece como miniatura, com nome, cargo, data e hora, e as opções **Assinar de novo** e **Remover**.
+- As assinaturas saem nos dois relatórios em PDF.
+- **Reabrir** uma auditoria **apaga as assinaturas**: o app avisa antes (no resultado e no menu ⋯ da lista).
+- O manual explica como assinar.
+
 ## Etapa 16 — Dois relatórios em PDF (4 nov 2026)
 
 - O botão **Baixar PDF** foi trocado por duas opções, no resultado e no menu **⋯** da lista de auditorias finalizadas:

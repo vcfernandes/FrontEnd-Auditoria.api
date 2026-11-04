@@ -2,6 +2,7 @@ import { Download, Loader2, MoreHorizontal, RotateCcw, Trash2 } from 'lucide-rea
 import { useState } from 'react'
 import {
   ROTULO_FORMATO,
+  useAuditoria,
   useExcluirAuditoria,
   useReabrirAuditoria,
   useRelatorioPdf,
@@ -27,6 +28,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { baixar } from '@/lib/arquivo'
 import { formatarData } from '@/lib/formatadores'
+import { AVISO_ASSINATURAS_APAGADAS } from '../resultado/BotaoReabrir'
 
 type Confirmacao = 'reabrir' | 'excluir' | null
 
@@ -40,6 +42,9 @@ export function AcoesAuditoria({ auditoria }: { auditoria: AuditoriaResumo }) {
   const [confirmacao, setConfirmacao] = useState<Confirmacao>(null)
   const [erro, setErro] = useState<string | null>(null)
   const [menuAberto, setMenuAberto] = useState(false)
+  // A lista não traz as assinaturas: só ao abrir "Reabrir" busca o detalhe para saber se há alguma a perder.
+  const detalhe = useAuditoria(confirmacao === 'reabrir' ? id : undefined)
+  const perdeAssinaturas = (detalhe.data?.assinaturas?.length ?? 0) > 0
 
   const abrir = (qual: Confirmacao) => {
     setErro(null)
@@ -66,7 +71,7 @@ export function AcoesAuditoria({ auditoria }: { auditoria: AuditoriaResumo }) {
     if (confirmacao === 'reabrir') reabrir.mutate(undefined, { onSuccess: () => setConfirmacao(null), onError: aoErrar })
     if (confirmacao === 'excluir') excluir.mutate(id, { onSuccess: () => setConfirmacao(null), onError: aoErrar })
   }
-  const pendente = reabrir.isPending || excluir.isPending
+  const pendente = reabrir.isPending || excluir.isPending || (confirmacao === 'reabrir' && detalhe.isPending)
 
   return (
     <>
@@ -121,6 +126,11 @@ export function AcoesAuditoria({ auditoria }: { auditoria: AuditoriaResumo }) {
                 : `A auditoria de ${auditoria.clienteNome} de ${formatarData(auditoria.dataAuditoria)} e todas as respostas serão apagadas. Não é possível desfazer.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          {confirmacao === 'reabrir' && perdeAssinaturas && (
+            <p role="alert" className="rounded-lg bg-destructive/10 p-3 text-sm font-medium text-destructive">
+              {AVISO_ASSINATURAS_APAGADAS}
+            </p>
+          )}
           {erro && (
             <p role="alert" className="text-sm text-destructive">
               {erro}

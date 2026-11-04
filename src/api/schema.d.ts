@@ -52,6 +52,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auditorias/{auditoriaId}/assinaturas/{papel}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["buscar"];
+        put: operations["assinar"];
+        post?: never;
+        delete: operations["excluir"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/clientes": {
         parameters: {
             query?: never;
@@ -254,7 +270,7 @@ export interface paths {
         get: operations["detalhar_2"];
         put?: never;
         post?: never;
-        delete: operations["excluir"];
+        delete: operations["excluir_1"];
         options?: never;
         head?: never;
         patch?: never;
@@ -283,10 +299,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["buscar"];
+        get: operations["buscar_1"];
         put?: never;
         post?: never;
-        delete: operations["excluir_1"];
+        delete: operations["excluir_2"];
         options?: never;
         head?: never;
         patch?: never;
@@ -379,6 +395,15 @@ export interface components {
         RespostasRequest: {
             respostas: components["schemas"]["RespostaItemRequest"][];
         };
+        AssinaturaResponse: {
+            /** @enum {string} */
+            papel?: "AUDITOR" | "RESPONSAVEL";
+            nome?: string;
+            cargo?: string;
+            /** Format: date-time */
+            assinadoEm?: string;
+            caminho?: string;
+        };
         AuditoriaItemResponse: {
             /** Format: uuid */
             id?: string;
@@ -421,6 +446,7 @@ export interface components {
             /** Format: date-time */
             atualizadoEm?: string;
             resumo?: components["schemas"]["ResumoRespostasResponse"];
+            assinaturas?: components["schemas"]["AssinaturaResponse"][];
             secoes?: components["schemas"]["AuditoriaSecaoResponse"][];
         };
         AuditoriaSecaoResponse: {
@@ -738,6 +764,83 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["AuditoriaResponse"];
                 };
+            };
+        };
+    };
+    buscar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                auditoriaId: string;
+                papel: "AUDITOR" | "RESPONSAVEL";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    assinar: {
+        parameters: {
+            query?: {
+                nome?: string;
+                cargo?: string;
+            };
+            header?: never;
+            path: {
+                auditoriaId: string;
+                papel: "AUDITOR" | "RESPONSAVEL";
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    imagem: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AssinaturaResponse"];
+                };
+            };
+        };
+    };
+    excluir: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                auditoriaId: string;
+                papel: "AUDITOR" | "RESPONSAVEL";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -1124,7 +1227,7 @@ export interface operations {
             };
         };
     };
-    excluir: {
+    excluir_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1168,7 +1271,7 @@ export interface operations {
             };
         };
     };
-    buscar: {
+    buscar_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1191,7 +1294,7 @@ export interface operations {
             };
         };
     };
-    excluir_1: {
+    excluir_2: {
         parameters: {
             query?: never;
             header?: never;

@@ -67,6 +67,7 @@ O backend é outro repositório (`auditoria-api`, Java 21 + Spring Boot 4) e já
   - `POST /auditorias/{id}/finalizar` (422 se faltar obrigatória), `POST /auditorias/{id}/reabrir`, `DELETE /auditorias/{id}` (só em andamento).
   - **Fotos**: `POST /auditorias/{id}/itens/{itemId}/fotos?id=<uuid>` (multipart, campo `arquivo`; JPEG/PNG/WebP, até 5 MB; 5 por item; só em andamento; `id` repetido no mesmo item devolve a existente), `GET` e `DELETE /auditorias/{id}/fotos/{fotoId}`. Cada item da auditoria traz `fotos[]`; o campo `caminho` é relativo à raiz da API.
   - `GET /auditorias/{id}/relatorio.pdf?formato=resumido|completo` (sem o parâmetro = resumido): só finalizada. Baixar com o token no header (fetch → blob), não por link direto. O nome vem no `Content-Disposition` e termina com o formato. O PDF já traz as fotos (o completo também o checklist inteiro).
+  - **Assinaturas** (só finalizada): `PUT /auditorias/{id}/assinaturas/{papel}` (`AUDITOR`|`RESPONSAVEL`; multipart `imagem` PNG até 500 KB e 2000 px, `nome`, `cargo` opcional), `GET` (imagem) e `DELETE`; `assinaturas[]` no detalhe da auditoria. Reabrir apaga todas.
 - `resumo`: total, respondidas, conformes, naoConformes, naoSeAplica, obrigatoriasPendentes.
 - Classificação: `EXCELENTE` (verde), `BOM` (azul), `REGULAR` (amarelo), `INADEQUADO` (vermelho).
 
@@ -76,7 +77,7 @@ O backend é outro repositório (`auditoria-api`, Java 21 + Spring Boot 4) e já
 2. **Clientes**: lista com busca + cadastro/edição
 3. **Nova auditoria**: escolher cliente e modelo
 4. **Responder auditoria**: perguntas agrupadas por seção, botões grandes Conforme / Não conforme / Não se aplica, observação por pergunta, **salvamento automático**, indicador de progresso (obrigatórias pendentes) e botão Finalizar
-5. **Resultado**: nota, classificação com a cor da faixa, resumo, botões de relatório (para o cliente / completo), botão Reabrir
+5. **Resultado**: nota, classificação com a cor da faixa, resumo, assinaturas na tela, botões de relatório (para o cliente / completo), botão Reabrir
 6. **Histórico**: página Auditorias com abas Realizadas (lista com filtros), Meus modelos e Biblioteca
 7. **Início (painel)**: resumo do dia, atalhos e últimas auditorias (`/inicio`)
 
@@ -186,6 +187,12 @@ Navegação no celular: barra inferior (Início, Auditorias, Clientes, Conta). N
   - Tempo limite: o cliente HTTP (`fetch`) não define nenhum, então a rota do PDF não tem limite do lado do app; não foi preciso mudar nada.
   - Nome do arquivo: continua vindo do `Content-Disposition` (agora termina em `-resumido.pdf`/`-completo.pdf`); sem ele, `relatorio-<id>-<formato>.pdf`.
   - Tipos regenerados (`npm run gen:api`). Testado no Chrome contra a API real (relatório com atraso artificial de 1,5 s): dois botões, bloqueio e uma única chamada com clique repetido, nomes `-resumido`/`-completo`, menu "⋯" e auditoria em andamento. **Não testado** o compartilhamento no celular real com o novo nome.
+- [x] Assinaturas na tela (`src/pages/auditorias/resultado/Assinaturas.tsx`, `src/components/assinatura/QuadroAssinatura.tsx`, `src/api/assinaturas.ts`, `src/lib/recortarAssinatura.ts`): seção "Assinaturas" no Resultado, antes dos botões de relatório; cartões Auditor (nome do usuário logado, editável, sem cargo) e Responsável (nome obrigatório + cargo opcional). Só com a auditoria finalizada (o Resultado já redireciona as em andamento).
+  - **Quadro**: `signature_pad` (5.1.4) num `Dialog` em tela cheia; `touch-action: none` no canvas (e o diálogo trava a rolagem da página); botões Limpar / Cancelar / Confirmar; dica "deite o celular" só em retrato com toque. Redimensiona o canvas (densidade de pixels) com `ResizeObserver` sem perder o traço, então girar a tela não apaga. As referências do canvas ficam em **estado** (não `useRef`): o conteúdo do `Dialog` entra no DOM depois do primeiro render (Portal do Radix) e um efeito com `ref` ficava sem canvas.
+  - **Imagem**: `recortarAssinatura` acha a caixa do traço pelo canal alfa, recorta com margem, reduz para no máximo 600 x 200 px e gera PNG com fundo **transparente** (a API aceita até 2000 px e 500 KB).
+  - **API**: `PUT /auditorias/{id}/assinaturas/{papel}` (multipart `imagem`, `nome`, `cargo`), `DELETE`, imagem por `GET` (blob com token, `useImagemAssinatura`, chave com `assinadoEm` para trocar ao assinar de novo). Lista vem em `assinaturas` do detalhe da auditoria; os hooks atualizam esse cache (`setQueryData`) sem nova busca.
+  - **Reabrir**: o backend apaga as assinaturas; `BotaoReabrir` (Resultado) e o menu "⋯" da lista mostram o aviso (`AVISO_ASSINATURAS_APAGADAS`). A lista não traz as assinaturas no resumo, então `AcoesAuditoria` busca o detalhe só ao abrir "Reabrir" (e segura o botão até chegar). `useReabrirAuditoria` zera `assinaturas` no cache e descarta as imagens.
+  - Testado no Chrome contra a API real (celular deitado 844x390 com toque via CDP, e 1280 px): quadro, rolagem, Limpar/Cancelar, PNG com alfa recortado (481x185 de 1632 px), nome/cargo, assinar de novo, remover, PDF, aviso e limpeza ao reabrir. **Não testado** em iPhone/Android reais (toque com a mão, rotação com o quadro aberto, caneta).
 - [x] Preparação para publicação atrás do Caddy (ver "Publicação"): `.env.production` com `VITE_API_URL=/api`; `montarUrl` passou de `new URL(..., origin)` para concatenação simples. O resto já estava conforme.
 - [x] Documentação para pessoas: `README.md` (o que é, stack, como rodar, comandos, links), `docs/MANUAL.md` (guia do consultor, passo a passo) e `CHANGELOG.md` (por etapa, linguagem simples). O `CLAUDE.md` continua sendo o contexto técnico para o assistente. O manual foi escrito a partir dos textos reais da interface; se um botão ou menu mudar de nome, atualize o manual.
 
