@@ -32,8 +32,11 @@ type Params = Record<string, string | number | boolean | null | undefined>
 interface Opcoes {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
   params?: Params
+  /** `FormData` vai como multipart; qualquer outro valor, como JSON. */
   body?: unknown
   signal?: AbortSignal
+  /** Sem o aviso de falta de conexão: para o que roda em segundo plano e tem a própria indicação na tela. */
+  semAviso?: boolean
 }
 
 /** Base + caminho por concatenação: funciona com base relativa (/api) ou absoluta. */
@@ -62,12 +65,14 @@ async function lerErro(resposta: Response): Promise<ApiError> {
 /** Faz a chamada com token e trata erros no formato da API; devolve a resposta já validada. */
 async function executar(
   caminho: string,
-  { method = 'GET', params, body, signal }: Opcoes,
+  { method = 'GET', params, body, signal, semAviso }: Opcoes,
   accept: string,
 ): Promise<Response> {
   const token = lerSessao()?.token
+  const multipart = body instanceof FormData
   const headers: Record<string, string> = { Accept: accept }
-  if (body !== undefined) headers['Content-Type'] = 'application/json'
+  // No multipart o Content-Type fica por conta do navegador, que precisa incluir o `boundary`.
+  if (body !== undefined && !multipart) headers['Content-Type'] = 'application/json'
   if (token) headers.Authorization = `Bearer ${token}`
 
   let resposta: Response
@@ -75,13 +80,13 @@ async function executar(
     resposta = await fetch(montarUrl(caminho, params), {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: multipart ? body : body === undefined ? undefined : JSON.stringify(body),
       signal,
     })
   } catch (erro) {
     if (erro instanceof DOMException && erro.name === 'AbortError') throw erro
     const mensagem = 'Não foi possível conectar ao servidor. Verifique sua internet.'
-    toast.error(mensagem)
+    if (!semAviso) toast.error(mensagem)
     throw new ApiError(0, mensagem)
   }
 
@@ -121,9 +126,9 @@ export interface ArquivoBaixado {
   nome: string | null
 }
 
-/** Baixa um arquivo autenticado (ex.: PDF) como blob — não dá para usar link direto por causa do token. */
+/** Baixa um arquivo autenticado (PDF, foto) como blob — não dá para usar link direto por causa do token. */
 async function arquivo(caminho: string, opcoes: Omit<Opcoes, 'method' | 'body'> = {}): Promise<ArquivoBaixado> {
-  const resposta = await executar(caminho, opcoes, 'application/pdf, application/json')
+  const resposta = await executar(caminho, opcoes, 'application/pdf, image/*, application/json')
   return { blob: await resposta.blob(), nome: nomeDoArquivo(resposta.headers.get('Content-Disposition')) }
 }
 

@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { PerguntaItem } from './PerguntaItem'
 
 interface Props {
+  auditoriaId: string
   indice: number
   titulo: string
   itens: ItemAuditoria[]
@@ -20,6 +21,7 @@ interface Props {
 }
 
 export const SecaoBloco = memo(function SecaoBloco({
+  auditoriaId,
   indice,
   titulo,
   itens,
@@ -73,6 +75,7 @@ export const SecaoBloco = memo(function SecaoBloco({
             return (
               <PerguntaItem
                 key={item.id}
+                auditoriaId={auditoriaId}
                 item={item}
                 numero={`${indice + 1}.${posicao + 1}`}
                 valor={respostas[item.id!]}

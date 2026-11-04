@@ -4,6 +4,7 @@ import type { ItemAuditoria } from '@/api/auditorias'
 import { Textarea } from '@/components/ui/textarea'
 import type { RespostaLocal, ValorResposta } from '@/lib/filaRespostas'
 import { cn } from '@/lib/utils'
+import { PerguntaFotos } from './PerguntaFotos'
 
 const OPCOES: { valor: ValorResposta; rotulo: string; marcado: string; desmarcado: string }[] = [
   {
@@ -27,6 +28,7 @@ const OPCOES: { valor: ValorResposta; rotulo: string; marcado: string; desmarcad
 ]
 
 interface Props {
+  auditoriaId: string
   item: ItemAuditoria
   numero: string
   valor: RespostaLocal
@@ -36,6 +38,7 @@ interface Props {
 }
 
 export const PerguntaItem = memo(function PerguntaItem({
+  auditoriaId,
   item,
   numero,
   valor,
@@ -113,6 +116,13 @@ export const PerguntaItem = memo(function PerguntaItem({
           Adicionar observação
         </button>
       )}
+
+      <PerguntaFotos
+        auditoriaId={auditoriaId}
+        itemId={itemId}
+        numero={numero}
+        naoConforme={valor.resposta === 'NAO_CONFORME'}
+      />
     </article>
   )
 })

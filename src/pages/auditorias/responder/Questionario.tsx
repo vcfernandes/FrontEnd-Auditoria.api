@@ -9,6 +9,7 @@ import {
   type ItemAuditoria,
 } from '@/api/auditorias'
 import { ApiError } from '@/api/client'
+import { filaFotos, useFotosPendentes, useLiberarFotosAoSair } from '@/api/fotos'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,6 +45,8 @@ export function Questionario({ auditoria }: { auditoria: Auditoria }) {
   const navigate = useNavigate()
   const { fila, estado } = useSalvamentoRespostas(id)
   const finalizar = useFinalizarAuditoria(id)
+  const fotosPendentes = useFotosPendentes(id)
+  useLiberarFotosAoSair(id)
 
   // A estrutura não muda durante a tela: guardada uma vez para não recriar as perguntas a cada salvamento.
   const [secoes] = useState(() => montarSecoes(auditoria))
@@ -107,34 +110,56 @@ export function Questionario({ auditoria }: { auditoria: Auditoria }) {
     setAbertas(new Set(secoes.flatMap((s, indice) => (s.itens.some((i) => pendentes.has(i.id!)) ? [indice] : []))))
   }
 
+  const rolarAtePergunta = (itemId: string) => {
+    const indice = secoes.findIndex((s) => s.itens.some((i) => i.id === itemId))
+    flushSync(() => {
+      setVisiveis(null)
+      setAbertas((atual) => new Set(atual).add(indice))
+    })
+    document.getElementById(`pergunta-${itemId}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   const irParaPrimeiraPendente = () => {
     const atuais = respostasRef.current
     const alvo =
       todosItens.find((i) => i.obrigatoria && !atuais[i.id!].resposta) ?? todosItens.find((i) => !atuais[i.id!].resposta)
     if (!alvo) return
-    const indice = secoes.findIndex((s) => s.itens.includes(alvo))
-    flushSync(() => {
-      setVisiveis(null)
-      setDestacar(true)
-      setAbertas((atual) => new Set(atual).add(indice))
-    })
-    document.getElementById(`pergunta-${alvo.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    setDestacar(true)
+    rolarAtePergunta(alvo.id!)
   }
 
-  // 1º salva o que falta; só então pede confirmação.
+  // 1º salva o que falta e espera as fotos; só então pede confirmação.
+  // A tela continua utilizável enquanto espera. Finalizar com foto na fila a perderia: o backend recusa foto em auditoria finalizada.
   const pedirFinalizacao = async () => {
     setErroFinalizar(null)
     setPreparando(true)
     const salvou = await fila.salvarAgora()
-    setPreparando(false)
     if (!salvou) {
+      setPreparando(false)
       setErroFinalizar('Não foi possível salvar as últimas respostas. Verifique a conexão e tente de novo.')
+      return
+    }
+    filaFotos.tentarDeNovo(id)
+    const fotosOk = await filaFotos.aguardar(id)
+    setPreparando(false)
+    if (!fotosOk) {
+      const naoEnviadas = filaFotos.daAuditoria(id)
+      setErroFinalizar(
+        `${naoEnviadas.length === 1 ? '1 foto ainda não foi enviada' : `${naoEnviadas.length} fotos ainda não foram enviadas`}. ` +
+          'Espere o envio ou, na própria pergunta, reenvie ou exclua a foto.',
+      )
+      if (naoEnviadas[0]) rolarAtePergunta(naoEnviadas[0].itemId)
       return
     }
     setConfirmando(true)
   }
 
   const confirmarFinalizacao = () => {
+    // Uma foto pode ter entrado na fila com a confirmação já aberta.
+    if (filaFotos.pendentes(id) > 0) {
+      void pedirFinalizacao()
+      return
+    }
     finalizar.mutate(undefined, {
       onSuccess: () => navigate(`/auditorias/${id}/resultado`, { replace: true }),
       onError: (erro) => {
@@ -179,6 +204,7 @@ export function Questionario({ auditoria }: { auditoria: Auditoria }) {
         total={todosItens.length}
         obrigatoriasPendentes={obrigatoriasPendentes}
         estado={estado}
+        fotosPendentes={fotosPendentes}
         soPendentes={visiveis !== null}
         onTentarDeNovo={() => fila.tentarDeNovo()}
         onAlternarFiltro={alternarFiltro}
@@ -189,6 +215,7 @@ export function Questionario({ auditoria }: { auditoria: Auditoria }) {
         return (
           <SecaoBloco
             key={indice}
+            auditoriaId={id}
             indice={indice}
             titulo={secao.titulo}
             itens={secao.itens}
@@ -226,7 +253,13 @@ export function Questionario({ auditoria }: { auditoria: Auditoria }) {
             onClick={() => void pedirFinalizacao()}
           >
             {(preparando || finalizar.isPending) && <Loader2 className="animate-spin" aria-hidden />}
-            {preparando ? 'Salvando respostas…' : finalizar.isPending ? 'Finalizando…' : 'Finalizar auditoria'}
+            {preparando
+              ? fotosPendentes > 0
+                ? `Enviando fotos (${fotosPendentes})…`
+                : 'Salvando respostas…'
+              : finalizar.isPending
+                ? 'Finalizando…'
+                : 'Finalizar auditoria'}
           </Button>
         </div>
       </div>

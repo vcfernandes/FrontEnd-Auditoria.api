@@ -9,7 +9,23 @@ export type AuditoriaDados = Schemas['AuditoriaRequest']
 export type SecaoAuditoria = Schemas['AuditoriaSecaoResponse']
 export type ItemAuditoria = Schemas['AuditoriaItemResponse']
 
-const chaveDetalhe = (id: string | undefined) => ['auditorias', 'detalhe', id]
+export const chaveDetalhe = (id: string | undefined) => ['auditorias', 'detalhe', id]
+
+/**
+ * A resposta do salvamento traz a auditoria inteira, mas pode ter sido montada antes de uma foto terminar de subir.
+ * Salvar respostas não muda fotos: as do cache (que os envios e exclusões mantêm em dia) continuam valendo.
+ */
+function comFotosDoCache(nova: Auditoria, atual: Auditoria | undefined): Auditoria {
+  if (!atual) return nova
+  const fotos = new Map(atual.secoes?.flatMap((s) => s.itens?.map((i) => [i.id, i.fotos] as const) ?? []))
+  return {
+    ...nova,
+    secoes: nova.secoes?.map((secao) => ({
+      ...secao,
+      itens: secao.itens?.map((item) => (fotos.has(item.id) ? { ...item, fotos: fotos.get(item.id) } : item)),
+    })),
+  }
+}
 
 export function useAuditoria(id: string | undefined) {
   return useQuery({
@@ -101,7 +117,7 @@ export function useSalvamentoRespostas(id: string) {
     () =>
       new FilaRespostas(async (respostas: RespostaEnvio[]) => {
         const auditoria = await api.put<Auditoria>(`/auditorias/${id}/respostas`, { respostas })
-        queryClient.setQueryData(chaveDetalhe(id), auditoria)
+        queryClient.setQueryData<Auditoria>(chaveDetalhe(id), (atual) => comFotosDoCache(auditoria, atual))
         // O progresso do cartão do histórico vem da lista: marca como desatualizada (recarrega ao voltar para lá).
         void queryClient.invalidateQueries({ queryKey: ['auditorias', 'lista'] })
       }),

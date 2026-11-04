@@ -14,7 +14,8 @@ export function ResponderAuditoriaPage() {
     return <EsqueletoQuestionario />
   }
 
-  if (auditoria.isError) {
+  // Só sem dados: uma nova busca que falhe (rede ruim) não pode tirar da tela as respostas e fotos em andamento.
+  if (!auditoria.data) {
     const erro = auditoria.error
     return (
       <div role="alert" className="flex flex-col items-start gap-3">

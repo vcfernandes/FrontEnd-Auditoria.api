@@ -4,6 +4,17 @@ O que foi feito no Auditorias, etapa por etapa, em linguagem simples. As etapas 
 
 O projeto está em fase de **protótipo**: o objetivo é o consultor usar no dia a dia e dar retorno.
 
+## Etapa 15 — Fotos nas respostas (4 nov 2026)
+
+- Cada pergunta agora tem o botão **Adicionar foto**: no celular abre a câmera traseira; no computador, a escolha de arquivo. Em **Não conforme**, o botão fica destacado em vermelho.
+- A foto é **reduzida no próprio aparelho** antes de subir (no máximo 1600 px, em JPEG), já na posição certa. Uma foto de 12 MB chega a virar cerca de 0,5 MB, o que ajuda muito em internet ruim.
+- **Envio em segundo plano**: a miniatura aparece na hora, com o aviso "Enviando…", e você continua respondendo. Se a internet falhar, o app tenta de novo sozinho, sem duplicar a foto, e oferece **Reenviar**. O envio continua mesmo se você sair da tela da auditoria (mas não feche o app).
+- Toque na miniatura para **ver em tela cheia** e **excluir** (com confirmação). São até **5 fotos por pergunta**, e o app avisa ao chegar no limite.
+- A tela de **resultado** mostra as fotos em cada não conformidade.
+- **Finalizar** espera as fotos terminarem de subir; se alguma não subir, o app avisa e leva até a pergunta, para nenhuma foto se perder.
+- Uma falha de rede ao atualizar a auditoria não troca mais a tela de responder por uma mensagem de erro.
+- Ainda não: o **PDF** do relatório não traz as fotos.
+
 ## Etapa 14 — Editor de modelos de checklist (3 nov 2026)
 
 - Agora você cria e edita os seus próprios **modelos de checklist**, sem depender de ninguém: **Auditorias → Meus modelos → Novo modelo**.

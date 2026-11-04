@@ -1,4 +1,4 @@
-import { ListFilter } from 'lucide-react'
+import { Camera, ListFilter } from 'lucide-react'
 import type { EstadoFila } from '@/lib/filaRespostas'
 import { cn } from '@/lib/utils'
 import { IndicadorSalvamento } from './IndicadorSalvamento'
@@ -10,6 +10,8 @@ interface Props {
   total: number
   obrigatoriasPendentes: number
   estado: EstadoFila
+  /** Fotos ainda não enviadas (seção recolhida esconde a miniatura; aqui a fila fica sempre à vista). */
+  fotosPendentes: number
   soPendentes: boolean
   onTentarDeNovo: () => void
   onAlternarFiltro: () => void
@@ -23,6 +25,7 @@ export function BarraProgresso({
   total,
   obrigatoriasPendentes,
   estado,
+  fotosPendentes,
   soPendentes,
   onTentarDeNovo,
   onAlternarFiltro,
@@ -36,7 +39,15 @@ export function BarraProgresso({
           <p className="truncate text-lg leading-tight font-semibold">{cliente}</p>
           {modelo && <p className="truncate text-xs text-muted-foreground">{modelo}</p>}
         </div>
-        <IndicadorSalvamento estado={estado} onTentarDeNovo={onTentarDeNovo} />
+        <div className="flex shrink-0 flex-col items-end gap-0.5">
+          <IndicadorSalvamento estado={estado} onTentarDeNovo={onTentarDeNovo} />
+          {fotosPendentes > 0 && (
+            <p role="status" className="flex items-center gap-1 text-xs text-muted-foreground tabular-nums">
+              <Camera className="size-3.5" aria-hidden />
+              {fotosPendentes === 1 ? '1 foto na fila' : `${fotosPendentes} fotos na fila`}
+            </p>
+          )}
+        </div>
       </div>
 
       <div

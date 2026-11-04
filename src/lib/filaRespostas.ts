@@ -26,7 +26,7 @@ const ESPERA_INICIAL_MS = 2_000
 const ESPERA_MAX_MS = 30_000
 
 /** Rede fora, timeout ou erro do servidor: vale tentar de novo sozinho. Outros 4xx não. */
-function tentarSozinho(erro: unknown) {
+export function tentarSozinho(erro: unknown) {
   if (!(erro instanceof ApiError)) return true
   return erro.status === 0 || erro.status >= 500 || erro.status === 408 || erro.status === 429
 }

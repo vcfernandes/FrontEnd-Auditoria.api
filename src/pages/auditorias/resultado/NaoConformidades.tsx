@@ -1,11 +1,14 @@
 import { PartyPopper } from 'lucide-react'
 import type { Auditoria } from '@/api/auditorias'
+import { useLiberarFotosAoSair } from '@/api/fotos'
 import { EstadoVazio } from '@/components/EstadoVazio'
+import { GaleriaFotos } from '@/components/fotos/GaleriaFotos'
 
 const porOrdem = (a: { ordem?: number }, b: { ordem?: number }) => (a.ordem ?? 0) - (b.ordem ?? 0)
 
 /** Itens marcados como Não conforme, agrupados por seção (com a mesma numeração da tela de responder). */
 export function NaoConformidades({ auditoria }: { auditoria: Auditoria }) {
+  useLiberarFotosAoSair(auditoria.id!)
   const grupos = [...(auditoria.secoes ?? [])]
     .sort(porOrdem)
     .map((secao, s) => ({
@@ -50,6 +53,11 @@ export function NaoConformidades({ auditoria }: { auditoria: Auditoria }) {
                   </p>
                 )}
                 {item.referenciaLegal && <p className="text-xs text-muted-foreground">{item.referenciaLegal}</p>}
+                <GaleriaFotos
+                  auditoriaId={auditoria.id!}
+                  itemId={item.id!}
+                  fotos={(item.fotos ?? []).map((foto) => ({ id: foto.id!, foto }))}
+                />
               </li>
             ))}
           </ul>
