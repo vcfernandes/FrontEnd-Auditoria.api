@@ -2,7 +2,7 @@
 
 Este guia mostra, passo a passo, como usar o **Auditorias** no dia a dia. Os nomes entre aspas são exatamente os que aparecem nos botões e menus.
 
-**Resumo do caminho completo:** criar conta → instalar no celular → cadastrar o cliente → ter um modelo de checklist → fazer a auditoria → finalizar → gerar e compartilhar o PDF.
+**Resumo do caminho completo:** criar conta → instalar no celular → cadastrar o cliente → ter um modelo de checklist → fazer a auditoria → finalizar → gerar e compartilhar o relatório em PDF.
 
 Você vai usar principalmente o **celular**, dentro do estabelecimento. No **computador** ficam mais confortáveis o histórico, a montagem de modelos e o download dos relatórios.
 
@@ -229,20 +229,30 @@ Depois de finalizada, você vê o **resultado**.
 
 ## 7. Gerar e compartilhar o PDF
 
-O relatório em PDF só existe para auditorias **finalizadas**.
+O relatório em PDF só existe para auditorias **finalizadas** (em andamento, não aparece).
+
+**Dois relatórios, para dois usos**
+
+| | **Relatório para o cliente** | **Relatório completo** |
+|---|---|---|
+| Para quê | Entregar ao dono do estabelecimento | Seu arquivo e a fiscalização |
+| O que traz | Dados básicos, nota e classificação em destaque, não conformidades (com observações, referência legal e **fotos**), observações gerais e assinaturas | Tudo do relatório para o cliente **e mais** o checklist inteiro, pergunta por pergunta, com a resposta, a observação e as fotos de qualquer resposta |
+| Tamanho | Curto | Maior |
+
+Na dúvida, envie ao cliente o **Relatório para o cliente** (é o botão em destaque) e guarde o **completo** no seu arquivo.
 
 **No computador**
 
-1. Abra o resultado e clique em **Baixar PDF**. O arquivo é baixado direto, na pasta de downloads, com o nome gerado pelo sistema.
-2. Também dá para baixar pela lista: em **Auditorias → Realizadas**, use o menu **⋯** da auditoria finalizada e escolha **Baixar PDF**.
+1. Abra o resultado e clique em **Relatório para o cliente** ou **Relatório completo**. O arquivo é baixado direto, na pasta de downloads, com o nome gerado pelo sistema (termina com `-resumido` ou `-completo`).
+2. Também dá para baixar pela lista: em **Auditorias → Realizadas**, use o menu **⋯** da auditoria finalizada e escolha um dos dois relatórios.
 
 **No celular**
 
-1. Abra o resultado e toque em **Baixar PDF**. Aguarde "Gerando PDF…".
+1. Abra o resultado e toque no relatório desejado.
 2. Normalmente abre a **folha de compartilhar** do aparelho: escolha **WhatsApp**, **e-mail** ou outro aplicativo para enviar ao cliente.
 3. Se a folha não abrir sozinha (acontece no iPhone), aparecem dois botões embaixo: **Compartilhar** (toque para abrir a folha) e **Abrir PDF** (para ver o arquivo e, de lá, salvar ou enviar).
 
-Para gerar de novo, toque em **Baixar PDF de novo**.
+**Pode levar alguns segundos.** Enquanto o relatório é gerado (principalmente com muitas fotos), o botão mostra "Gerando…" e os dois ficam bloqueados; é só aguardar, sem tocar de novo. Para gerar outro, espere terminar.
 
 ---
 
@@ -254,7 +264,7 @@ Em **Auditorias → Realizadas** ficam todas as suas auditorias, as mais recente
 - **Filtrar** por status (**Todos**, **Em andamento**, **Finalizadas**), por **cliente** e por período (**De** e **Até**, pela data da auditoria). **Limpar filtros** zera tudo.
 - No computador, a lista é uma **tabela**; no celular, **cartões**. Cada auditoria tem **Continuar** (em andamento) ou **Ver resultado** (finalizada).
 - Em andamento: o menu **⋯** tem **Excluir** (pede confirmação; apaga a auditoria e as respostas, e não dá para desfazer).
-- Finalizada: o menu **⋯** tem **Baixar PDF** e **Reabrir**.
+- Finalizada: o menu **⋯** tem **Relatório para o cliente**, **Relatório completo** e **Reabrir**.
 - Os filtros ficam no endereço da página: ao voltar de uma auditoria, a lista continua como você deixou.
 
 O **Início** mostra o resumo do dia: auditorias em andamento, finalizadas no mês, clientes ativos, a nota média dos últimos 90 dias, atalhos e as últimas auditorias.
@@ -272,8 +282,8 @@ O acesso vale por 8 horas. Entre de novo. Respostas já salvas não se perdem.
 **Não consigo finalizar.**
 Falta responder alguma pergunta **obrigatória**. O app leva você até ela.
 
-**Cliquei em Baixar PDF e nada aconteceu no celular.**
-Espere o "Gerando PDF…" terminar e use os botões **Compartilhar** ou **Abrir PDF** que aparecem logo abaixo.
+**Pedi o relatório e nada aconteceu no celular.**
+Espere o "Gerando…" terminar (pode levar alguns segundos) e use os botões **Compartilhar** ou **Abrir PDF** que aparecem logo abaixo.
 
 **Não acho um cliente.**
 Ele pode estar inativo: abra **Clientes → Inativos**.

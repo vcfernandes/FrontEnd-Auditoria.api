@@ -1146,7 +1146,9 @@ export interface operations {
     };
     relatorio: {
         parameters: {
-            query?: never;
+            query?: {
+                formato?: "resumido" | "completo";
+            };
             header?: never;
             path: {
                 id: string;

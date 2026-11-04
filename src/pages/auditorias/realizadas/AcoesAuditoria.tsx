@@ -1,10 +1,12 @@
-import { Download, MoreHorizontal, RotateCcw, Trash2 } from 'lucide-react'
+import { Download, Loader2, MoreHorizontal, RotateCcw, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import {
+  ROTULO_FORMATO,
   useExcluirAuditoria,
   useReabrirAuditoria,
   useRelatorioPdf,
   type AuditoriaResumo,
+  type FormatoRelatorio,
 } from '@/api/auditorias'
 import { ApiError } from '@/api/client'
 import {
@@ -37,6 +39,7 @@ export function AcoesAuditoria({ auditoria }: { auditoria: AuditoriaResumo }) {
   const excluir = useExcluirAuditoria()
   const [confirmacao, setConfirmacao] = useState<Confirmacao>(null)
   const [erro, setErro] = useState<string | null>(null)
+  const [menuAberto, setMenuAberto] = useState(false)
 
   const abrir = (qual: Confirmacao) => {
     setErro(null)
@@ -44,14 +47,18 @@ export function AcoesAuditoria({ auditoria }: { auditoria: AuditoriaResumo }) {
   }
 
   // A tabela só aparece no computador: o PDF é baixado direto (sem a folha de compartilhar do celular).
-  const baixarPdf = () =>
-    pdf.mutate(undefined, {
+  // O menu fica aberto enquanto gera (com "Gerando…" e itens bloqueados) e fecha quando termina.
+  const baixarPdf = (formato: FormatoRelatorio) => {
+    if (pdf.isPending) return
+    pdf.mutate(formato, {
       onSuccess: ({ blob, nome }) => {
         const url = URL.createObjectURL(blob)
-        baixar(url, nome ?? `relatorio-${id}.pdf`)
+        baixar(url, nome ?? `relatorio-${id}-${formato}.pdf`)
         setTimeout(() => URL.revokeObjectURL(url), 10_000)
       },
+      onSettled: () => setMenuAberto(false),
     })
+  }
 
   const confirmar = () => {
     const aoErrar = (falha: Error) =>
@@ -63,20 +70,33 @@ export function AcoesAuditoria({ auditoria }: { auditoria: AuditoriaResumo }) {
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={menuAberto} onOpenChange={setMenuAberto}>
         <DropdownMenuTrigger
           aria-label={`Mais ações da auditoria de ${auditoria.clienteNome}`}
           className="flex size-10 items-center justify-center rounded-lg text-muted-foreground outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring data-[state=open]:bg-muted"
         >
           <MoreHorizontal className="size-5" aria-hidden />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuContent align="end" className="w-64">
           {finalizada ? (
             <>
-              <DropdownMenuItem className="h-10 cursor-pointer" disabled={pdf.isPending} onSelect={baixarPdf}>
-                <Download aria-hidden />
-                {pdf.isPending ? 'Gerando PDF…' : 'Baixar PDF'}
-              </DropdownMenuItem>
+              {(['resumido', 'completo'] as const).map((formato) => {
+                const gerando = pdf.isPending && pdf.variables === formato
+                return (
+                  <DropdownMenuItem
+                    key={formato}
+                    className={`h-10 cursor-pointer ${formato === 'resumido' ? 'font-medium' : ''}`}
+                    disabled={pdf.isPending}
+                    onSelect={(e) => {
+                      e.preventDefault()
+                      baixarPdf(formato)
+                    }}
+                  >
+                    {gerando ? <Loader2 className="animate-spin" aria-hidden /> : <Download aria-hidden />}
+                    {gerando ? 'Gerando…' : ROTULO_FORMATO[formato]}
+                  </DropdownMenuItem>
+                )
+              })}
               <DropdownMenuItem className="h-10 cursor-pointer" onSelect={() => abrir('reabrir')}>
                 <RotateCcw aria-hidden />
                 Reabrir

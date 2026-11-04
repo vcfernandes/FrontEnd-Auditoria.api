@@ -136,11 +136,22 @@ export function useSalvamentoRespostas(id: string) {
   return { fila, estado }
 }
 
-/** PDF do relatório (só auditoria finalizada). Baixado com o token, como blob. */
+export type FormatoRelatorio = 'resumido' | 'completo'
+
+export const ROTULO_FORMATO: Record<FormatoRelatorio, string> = {
+  resumido: 'Relatório para o cliente',
+  completo: 'Relatório completo',
+}
+
+/**
+ * PDF do relatório (só auditoria finalizada), no formato pedido. Baixado com o token, como blob.
+ * Gerar pode levar vários segundos; o cliente HTTP não tem tempo limite, então a espera é só do navegador.
+ * Use `isPending` para bloquear novos cliques enquanto gera.
+ */
 export function useRelatorioPdf(id: string) {
   return useMutation({
-    mutationFn: () => api.arquivo(`/auditorias/${id}/relatorio.pdf`),
-    onSuccess: () => toast.success('PDF gerado.'),
+    mutationFn: (formato: FormatoRelatorio) => api.arquivo(`/auditorias/${id}/relatorio.pdf`, { params: { formato } }),
+    onSuccess: (_, formato) => toast.success(`${ROTULO_FORMATO[formato]} gerado.`),
   })
 }
 

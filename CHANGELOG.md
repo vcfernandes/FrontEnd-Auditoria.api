@@ -4,6 +4,17 @@ O que foi feito no Auditorias, etapa por etapa, em linguagem simples. As etapas 
 
 O projeto está em fase de **protótipo**: o objetivo é o consultor usar no dia a dia e dar retorno.
 
+## Etapa 16 — Dois relatórios em PDF (4 nov 2026)
+
+- O botão **Baixar PDF** foi trocado por duas opções, no resultado e no menu **⋯** da lista de auditorias finalizadas:
+  - **Relatório para o cliente** (em destaque): curto, com a nota, as não conformidades com fotos e as assinaturas. É o que se entrega ao dono do estabelecimento.
+  - **Relatório completo**: tudo isso e mais o checklist inteiro, para seu arquivo e para a fiscalização.
+- Gerar o relatório pode levar alguns segundos. Enquanto isso o botão mostra **Gerando…** e as duas opções ficam bloqueadas, para não gerar duas vezes sem querer.
+- O nome do arquivo agora termina com o tipo (`-resumido` ou `-completo`).
+- Auditorias em andamento não oferecem relatório.
+- O manual explica a diferença entre os dois relatórios.
+- Os PDFs agora trazem as fotos (isso vem da atualização da API).
+
 ## Etapa 15 — Fotos nas respostas (4 nov 2026)
 
 - Cada pergunta agora tem o botão **Adicionar foto**: no celular abre a câmera traseira; no computador, a escolha de arquivo. Em **Não conforme**, o botão fica destacado em vermelho.
@@ -13,7 +24,7 @@ O projeto está em fase de **protótipo**: o objetivo é o consultor usar no dia
 - A tela de **resultado** mostra as fotos em cada não conformidade.
 - **Finalizar** espera as fotos terminarem de subir; se alguma não subir, o app avisa e leva até a pergunta, para nenhuma foto se perder.
 - Uma falha de rede ao atualizar a auditoria não troca mais a tela de responder por uma mensagem de erro.
-- Ainda não: o **PDF** do relatório não traz as fotos.
+- Nesta etapa o **PDF** ainda não trazia as fotos (resolvido na Etapa 16).
 
 ## Etapa 14 — Editor de modelos de checklist (3 nov 2026)
 

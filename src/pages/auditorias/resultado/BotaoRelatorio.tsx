@@ -1,6 +1,6 @@
 import { Download, ExternalLink, Loader2, Share2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { useRelatorioPdf } from '@/api/auditorias'
+import { ROTULO_FORMATO, useRelatorioPdf, type FormatoRelatorio } from '@/api/auditorias'
 import { ApiError } from '@/api/client'
 import { Button } from '@/components/ui/button'
 import { baixar, compartilhar, ehTelaDeToque, podeCompartilhar } from '@/lib/arquivo'
@@ -27,10 +27,11 @@ export function BotaoRelatorio({ auditoriaId }: { auditoriaId: string }) {
     [],
   )
 
-  const gerar = () => {
-    relatorio.mutate(undefined, {
+  const gerar = (formato: FormatoRelatorio) => {
+    if (relatorio.isPending) return
+    relatorio.mutate(formato, {
       onSuccess: ({ blob, nome }) => {
-        const arquivo = new File([blob], nome ?? `relatorio-${auditoriaId}.pdf`, { type: 'application/pdf' })
+        const arquivo = new File([blob], nome ?? `relatorio-${auditoriaId}-${formato}.pdf`, { type: 'application/pdf' })
         if (urlRef.current) URL.revokeObjectURL(urlRef.current)
         const url = URL.createObjectURL(arquivo)
         urlRef.current = url
@@ -46,10 +47,26 @@ export function BotaoRelatorio({ auditoriaId }: { auditoriaId: string }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <Button size="lg" className="h-12 text-base" disabled={relatorio.isPending} onClick={gerar}>
-        {relatorio.isPending ? <Loader2 className="animate-spin" aria-hidden /> : <Download aria-hidden />}
-        {relatorio.isPending ? 'Gerando PDF…' : pdf ? 'Baixar PDF de novo' : 'Baixar PDF'}
-      </Button>
+      {(['resumido', 'completo'] as const).map((formato) => {
+        const gerando = relatorio.isPending && relatorio.variables === formato
+        return (
+          <Button
+            key={formato}
+            variant={formato === 'resumido' ? 'default' : 'outline'}
+            size="lg"
+            className="h-12 text-base"
+            disabled={relatorio.isPending}
+            aria-busy={gerando}
+            onClick={() => gerar(formato)}
+          >
+            {gerando ? <Loader2 className="animate-spin" aria-hidden /> : <Download aria-hidden />}
+            {gerando ? 'Gerando… pode levar alguns segundos' : ROTULO_FORMATO[formato]}
+          </Button>
+        )
+      })}
+      <p className="text-xs text-muted-foreground">
+        O relatório para o cliente traz a nota, as não conformidades com fotos e as assinaturas. O completo traz isso e mais o checklist inteiro, para arquivo e fiscalização.
+      </p>
 
       {relatorio.isError && (
         <p role="alert" className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">

@@ -66,7 +66,7 @@ O backend é outro repositório (`auditoria-api`, Java 21 + Spring Boot 4) e já
   - `PUT /auditorias/{id}/respostas` com `{ "respostas": [{ itemId, resposta, observacao }] }`. `resposta`: `CONFORME`, `NAO_CONFORME`, `NAO_SE_APLICA` ou `null` (limpa). Só com status `EM_ANDAMENTO`.
   - `POST /auditorias/{id}/finalizar` (422 se faltar obrigatória), `POST /auditorias/{id}/reabrir`, `DELETE /auditorias/{id}` (só em andamento).
   - **Fotos**: `POST /auditorias/{id}/itens/{itemId}/fotos?id=<uuid>` (multipart, campo `arquivo`; JPEG/PNG/WebP, até 5 MB; 5 por item; só em andamento; `id` repetido no mesmo item devolve a existente), `GET` e `DELETE /auditorias/{id}/fotos/{fotoId}`. Cada item da auditoria traz `fotos[]`; o campo `caminho` é relativo à raiz da API.
-  - `GET /auditorias/{id}/relatorio.pdf`: só finalizada. Baixar com o token no header (fetch → blob), não por link direto.
+  - `GET /auditorias/{id}/relatorio.pdf?formato=resumido|completo` (sem o parâmetro = resumido): só finalizada. Baixar com o token no header (fetch → blob), não por link direto. O nome vem no `Content-Disposition` e termina com o formato. O PDF já traz as fotos (o completo também o checklist inteiro).
 - `resumo`: total, respondidas, conformes, naoConformes, naoSeAplica, obrigatoriasPendentes.
 - Classificação: `EXCELENTE` (verde), `BOM` (azul), `REGULAR` (amarelo), `INADEQUADO` (vermelho).
 
@@ -76,7 +76,7 @@ O backend é outro repositório (`auditoria-api`, Java 21 + Spring Boot 4) e já
 2. **Clientes**: lista com busca + cadastro/edição
 3. **Nova auditoria**: escolher cliente e modelo
 4. **Responder auditoria**: perguntas agrupadas por seção, botões grandes Conforme / Não conforme / Não se aplica, observação por pergunta, **salvamento automático**, indicador de progresso (obrigatórias pendentes) e botão Finalizar
-5. **Resultado**: nota, classificação com a cor da faixa, resumo, botão Baixar PDF, botão Reabrir
+5. **Resultado**: nota, classificação com a cor da faixa, resumo, botões de relatório (para o cliente / completo), botão Reabrir
 6. **Histórico**: página Auditorias com abas Realizadas (lista com filtros), Meus modelos e Biblioteca
 7. **Início (painel)**: resumo do dia, atalhos e últimas auditorias (`/inicio`)
 
@@ -179,8 +179,13 @@ Navegação no celular: barra inferior (Início, Auditorias, Clientes, Conta). N
   - **Cache do detalhe**: as fotos ficam em `item.fotos` do detalhe da auditoria. A resposta do PUT de respostas pode ter sido montada antes de uma foto subir, por isso `comFotosDoCache` (`src/api/auditorias.ts`) mantém as fotos do cache ao gravá-la. `useFotosDoItem` usa `select`: a pergunta só redesenha quando as fotos dela mudam.
   - **Finalizar**: salva as respostas, tenta de novo as que falharam e espera a fila ("Enviando fotos (n)…", tela utilizável). Se alguma falhar ou for recusada, avisa e rola até a pergunta, sem abrir a confirmação (finalizar perderia a foto: o backend recusa foto em auditoria finalizada). A confirmação confere a fila de novo.
   - `ResponderAuditoriaPage` só mostra a tela de erro se não houver dados: antes, uma nova busca com falha de rede trocava o questionário pela tela de erro, perdendo as respostas ainda na fila.
-  - Limites: a fila fica só em memória: fechar o app ou recarregar perde o que não subiu (`beforeunload` avisa, mas o iPhone pode não mostrar; guardar no aparelho faz parte do modo offline, no backlog). O PDF do backend ainda não inclui as fotos. Foto em pergunta que não é Não conforme fica guardada, mas não aparece no Resultado.
+  - Limites: a fila fica só em memória: fechar o app ou recarregar perde o que não subiu (`beforeunload` avisa, mas o iPhone pode não mostrar; guardar no aparelho faz parte do modo offline, no backlog). Foto em pergunta que não é Não conforme fica guardada, mas não aparece no Resultado.
   - Testado no Chrome (telas de 1280 e 390 px) contra a API real, sem `crypto.randomUUID`, incluindo: orientação EXIF, resposta perdida sem duplicar, corrida com o PUT, 401 e finalização com fila. **Não testado** em iPhone/Android reais (câmera, HEIC e orientação no Safari).
+- [x] Dois formatos de relatório PDF: no Resultado (`BotaoRelatorio.tsx`) e no menu "⋯" das finalizadas (`AcoesAuditoria.tsx`), "Baixar PDF" virou **Relatório para o cliente** (`formato=resumido`, botão/destaque primário) e **Relatório completo** (`formato=completo`). Auditoria em andamento não oferece relatório (o Resultado redireciona; o menu só mostra Excluir).
+  - `useRelatorioPdf(id)` (`src/api/auditorias.ts`) recebe o formato na chamada (`mutate('resumido' | 'completo')`); `ROTULO_FORMATO` guarda os nomes exibidos. Uma única mutação por auditoria: enquanto `isPending`, os dois botões/itens ficam bloqueados e o escolhido mostra "Gerando…" (também há guarda `if (isPending) return`). No menu "⋯" o menu fica aberto durante a geração e fecha ao terminar.
+  - Tempo limite: o cliente HTTP (`fetch`) não define nenhum, então a rota do PDF não tem limite do lado do app; não foi preciso mudar nada.
+  - Nome do arquivo: continua vindo do `Content-Disposition` (agora termina em `-resumido.pdf`/`-completo.pdf`); sem ele, `relatorio-<id>-<formato>.pdf`.
+  - Tipos regenerados (`npm run gen:api`). Testado no Chrome contra a API real (relatório com atraso artificial de 1,5 s): dois botões, bloqueio e uma única chamada com clique repetido, nomes `-resumido`/`-completo`, menu "⋯" e auditoria em andamento. **Não testado** o compartilhamento no celular real com o novo nome.
 - [x] Preparação para publicação atrás do Caddy (ver "Publicação"): `.env.production` com `VITE_API_URL=/api`; `montarUrl` passou de `new URL(..., origin)` para concatenação simples. O resto já estava conforme.
 - [x] Documentação para pessoas: `README.md` (o que é, stack, como rodar, comandos, links), `docs/MANUAL.md` (guia do consultor, passo a passo) e `CHANGELOG.md` (por etapa, linguagem simples). O `CLAUDE.md` continua sendo o contexto técnico para o assistente. O manual foi escrito a partir dos textos reais da interface; se um botão ou menu mudar de nome, atualize o manual.
 
