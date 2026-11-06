@@ -132,6 +132,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/verificar-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["verificarEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/registrar": {
         parameters: {
             query?: never;
@@ -148,6 +164,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/reenviar-verificacao": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reenviarVerificacao"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/redefinir-senha": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["redefinirSenha"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/login": {
         parameters: {
             query?: never;
@@ -158,6 +206,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/esqueci-senha": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["esqueciSenha"];
         delete?: never;
         options?: never;
         head?: never;
@@ -480,9 +544,29 @@ export interface components {
             /** Format: int32 */
             obrigatoriasPendentes?: number;
         };
+        VerificarEmailRequest: {
+            token: string;
+        };
         RegistrarRequest: {
             nomeOrganizacao: string;
             nome: string;
+            /** Format: email */
+            email: string;
+            senha: string;
+        };
+        RegistroResponse: {
+            email?: string;
+            mensagem?: string;
+        };
+        EmailRequest: {
+            /** Format: email */
+            email: string;
+        };
+        RedefinirSenhaRequest: {
+            token: string;
+            senha: string;
+        };
+        LoginRequest: {
             /** Format: email */
             email: string;
             senha: string;
@@ -496,11 +580,6 @@ export interface components {
             nome?: string;
             email?: string;
             papel?: string;
-        };
-        LoginRequest: {
-            /** Format: email */
-            email: string;
-            senha: string;
         };
         AuditoriaRequest: {
             /** Format: uuid */
@@ -985,6 +1064,28 @@ export interface operations {
             };
         };
     };
+    verificarEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerificarEmailRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     registrar: {
         parameters: {
             query?: never;
@@ -1004,8 +1105,52 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["AuthResponse"];
+                    "*/*": components["schemas"]["RegistroResponse"];
                 };
+            };
+        };
+    };
+    reenviarVerificacao: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    redefinirSenha: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RedefinirSenhaRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -1030,6 +1175,28 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["AuthResponse"];
                 };
+            };
+        };
+    };
+    esqueciSenha: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

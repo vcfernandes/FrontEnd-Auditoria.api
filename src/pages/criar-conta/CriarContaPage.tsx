@@ -37,9 +37,10 @@ export function CriarContaPage() {
   const enviar = handleSubmit(({ nomeOrganizacao, nome, email, senha }) => {
     setErroGeral(null)
     registrar.mutate(
-      { nomeOrganizacao, nome, email, senha },
+      { nomeOrganizacao, nome, email: email.trim(), senha },
       {
-        onSuccess: () => navigate('/inicio', { replace: true }),
+        // O cadastro não entra na conta: antes é preciso confirmar o e-mail.
+        onSuccess: () => navigate('/confira-email', { replace: true, state: { email: email.trim() } }),
         onError: (erro) =>
           setErroGeral(aplicarErroApi(erro, setError, ['nomeOrganizacao', 'nome', 'email', 'senha'])),
       },

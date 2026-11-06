@@ -54,8 +54,8 @@ export default defineConfig({
     },
   },
   server: {
-    // Aceita acesso pela rede local (ex.: testar no celular pelo Wi-Fi).
-    host: true,
+  host: true,
+  allowedHosts: ['shucking-legwork-effective.ngrok-free.dev'],
     proxy: {
       // /api/* -> http://localhost:8080/* (o front chama sempre a própria origem).
       '/api': {

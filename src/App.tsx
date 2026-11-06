@@ -11,9 +11,13 @@ import { InicioPage } from '@/pages/inicio/InicioPage'
 import { ClienteFormPage } from '@/pages/clientes/ClienteFormPage'
 import { ClientesPage } from '@/pages/clientes/ClientesPage'
 import { ContaPage } from '@/pages/conta/ContaPage'
+import { ConfiraEmailPage } from '@/pages/criar-conta/ConfiraEmailPage'
 import { CriarContaPage } from '@/pages/criar-conta/CriarContaPage'
 import { EntrarPage } from '@/pages/entrar/EntrarPage'
+import { EsqueciSenhaPage } from '@/pages/esqueci-senha/EsqueciSenhaPage'
 import { NaoEncontradaPage } from '@/pages/nao-encontrada/NaoEncontradaPage'
+import { RedefinirSenhaPage } from '@/pages/redefinir-senha/RedefinirSenhaPage'
+import { VerificarEmailPage } from '@/pages/verificar-email/VerificarEmailPage'
 import { AvisoAtualizacao } from '@/pwa/AvisoAtualizacao'
 
 const router = createBrowserRouter([
@@ -22,8 +26,13 @@ const router = createBrowserRouter([
     children: [
       { path: '/entrar', element: <EntrarPage /> },
       { path: '/criar-conta', element: <CriarContaPage /> },
+      { path: '/confira-email', element: <ConfiraEmailPage /> },
+      { path: '/esqueci-senha', element: <EsqueciSenhaPage /> },
     ],
   },
+  // Links dos e-mails: abrem mesmo com sessão ativa (fora de RotaPublica), senão o token se perderia no redirecionamento.
+  { path: '/verificar-email', element: <VerificarEmailPage /> },
+  { path: '/redefinir-senha', element: <RedefinirSenhaPage /> },
   {
     element: <RotaProtegida />,
     children: [

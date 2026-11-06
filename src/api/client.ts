@@ -11,6 +11,8 @@ interface ErroApiCorpo {
   status: number
   mensagem: string
   campos?: Record<string, string>
+  /** Código estável para o front decidir o que fazer (ex.: EMAIL_NAO_VERIFICADO, LINK_INVALIDO, MUITAS_TENTATIVAS). */
+  codigo?: string
   timestamp?: string
 }
 
@@ -18,12 +20,14 @@ export class ApiError extends Error {
   readonly status: number
   /** Em erros de validação (400): campo → mensagem. */
   readonly campos: Record<string, string>
+  readonly codigo?: string
 
-  constructor(status: number, mensagem: string, campos: Record<string, string> = {}) {
+  constructor(status: number, mensagem: string, campos: Record<string, string> = {}, codigo?: string) {
     super(mensagem)
     this.name = 'ApiError'
     this.status = status
     this.campos = campos
+    this.codigo = codigo
   }
 }
 
@@ -56,6 +60,7 @@ async function lerErro(resposta: Response): Promise<ApiError> {
       resposta.status,
       corpo.mensagem ?? `Erro inesperado (status ${resposta.status}).`,
       corpo.campos ?? {},
+      corpo.codigo,
     )
   } catch {
     return new ApiError(resposta.status, `Erro inesperado (status ${resposta.status}).`)

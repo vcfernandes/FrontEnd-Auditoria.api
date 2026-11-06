@@ -4,6 +4,16 @@ O que foi feito no Auditorias, etapa por etapa, em linguagem simples. As etapas 
 
 O projeto está em fase de **protótipo**: o objetivo é o consultor usar no dia a dia e dar retorno.
 
+## Etapa 18 — Confirmação de e-mail e senha esquecida (6 nov 2026)
+
+- **Criar conta** agora termina na tela **Confira seu e-mail**, com o endereço usado e o botão **Reenviar e-mail de confirmação** (uma vez por minuto). A conta só entra em uso depois de tocar no link do e-mail.
+- Ao abrir o link, o app mostra **E-mail confirmado** com o botão **Entrar**. Se o link venceu ou já foi usado, explica e deixa pedir outro informando o e-mail.
+- Em **Entrar**, quem ainda não confirmou o e-mail vê o aviso e a opção de reenviar. Há também o link **Esqueci minha senha**.
+- **Esqueci minha senha**: informe o e-mail e a tela diz sempre "Se houver uma conta com este e-mail, enviamos um link". O link abre a tela de **nova senha** (8 a 72 caracteres, com confirmação); ao salvar, você volta para Entrar com o aviso "Senha alterada".
+- Quando há **muitas tentativas**, o app mostra o aviso do sistema com quanto tempo esperar.
+- A chave do link sai da barra de endereço assim que a página abre, e cada link só funciona uma vez.
+- O manual explica como confirmar o e-mail e recuperar a senha.
+
 ## Etapa 17 — Assinatura na tela (4 nov 2026)
 
 - No **resultado** da auditoria finalizada há uma seção **Assinaturas**, antes dos botões de relatório, com dois cartões: **Auditor** (o seu nome já vem preenchido, mas pode ser trocado) e **Responsável pelo estabelecimento** (nome e cargo).

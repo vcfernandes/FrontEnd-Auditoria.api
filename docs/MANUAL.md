@@ -33,12 +33,27 @@ Você vai usar principalmente o **celular**, dentro do estabelecimento. No **com
    - **Seu nome**;
    - **E-mail** (é com ele que você vai entrar);
    - **Senha** e **Confirmar senha**.
-4. Toque em **Criar conta**. Você já entra direto no painel **Início**.
+4. Toque em **Criar conta**. Aparece a tela **Confira seu e-mail**, com o endereço que você usou.
+5. Abra o e-mail que enviamos e toque no link de confirmação (vale por **24 horas**). Aparece **E-mail confirmado**; toque em **Entrar**.
+
+> A conta só pode ser usada depois de confirmar o e-mail. Não chegou? Veja a caixa de **spam** e, na tela **Confira seu e-mail**, toque em **Reenviar e-mail de confirmação** (dá para reenviar uma vez por minuto). Digitou o e-mail errado? Toque em **Usei o e-mail errado** e crie a conta de novo.
 
 **Entrar nas próximas vezes**
 
 1. Digite o **E-mail** e a **Senha** e toque em **Entrar**.
 2. Por segurança, o acesso vale por **8 horas**. Depois disso o app pede a senha de novo.
+3. Se aparecer que o e-mail ainda não foi confirmado, toque em **Reenviar e-mail de confirmação** e use o link novo.
+
+**Esqueci minha senha**
+
+1. Na tela **Entrar**, toque em **Esqueci minha senha** e informe o e-mail da conta.
+2. Aparece sempre a mesma mensagem: "Se houver uma conta com este e-mail, enviamos um link". Isso é de propósito, para ninguém descobrir quais e-mails têm conta.
+3. Abra o e-mail e toque no link (vale por **1 hora**). Digite a **nova senha** (de 8 a 72 caracteres) duas vezes e toque em **Salvar nova senha**.
+4. Você volta para **Entrar** com o aviso "Senha alterada". Entre com a senha nova.
+
+Cada link só funciona **uma vez**. Se aparecer **Link inválido** (venceu ou já foi usado), peça um novo: na confirmação de e-mail informe o e-mail e toque em **Enviar novo link de confirmação**; na senha, toque em **Pedir novo link**.
+
+**Muitas tentativas:** depois de várias senhas erradas ou de pedidos seguidos de e-mail, o app avisa quanto tempo esperar antes de tentar de novo.
 
 **Sair:** toque em **Conta** (barra de baixo no celular) e em **Sair**. No computador, clique no seu nome no canto superior direito.
 
@@ -276,6 +291,12 @@ O **Início** mostra o resumo do dia: auditorias em andamento, finalizadas no m�
 
 **Apareceu um aviso vermelho dizendo que não foi possível conectar.**
 Verifique a internet (Wi-Fi ou dados móveis) e tente de novo. Em uma auditoria, suas respostas são reenviadas sozinhas quando a conexão voltar. O app abre sem internet, mas só consegue carregar e salvar dados online.
+
+**O e-mail de confirmação (ou de nova senha) não chega.**
+Veja a caixa de spam e confira se o endereço está certo. Depois peça o reenvio: só dá para pedir uma vez por minuto, e o app mostra o tempo de espera.
+
+**Aparece "Link inválido".**
+O link venceu ou já foi usado (cada um funciona uma vez). Peça outro, como explicado na seção 1.
 
 **O app pediu minha senha de repente.**
 O acesso vale por 8 horas. Entre de novo. Respostas já salvas não se perdem.
